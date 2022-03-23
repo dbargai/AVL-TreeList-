@@ -184,9 +184,10 @@ class AVLTreeList(object):
 	def createNode(self,node,val):
 		node.setValue(val)
 		node.setLeft(AVLNode(None))
-		node.left.setParent(self)
+		node.left.setParent(node)
 		node.setRight(AVLNode(None))
-		node.right.setParent(self)
+		node.right.setParent(node)
+		node.setHeight(0)
 		node.size+=1
 		return None
 
@@ -201,7 +202,7 @@ class AVLTreeList(object):
 	"""
 	def createRoot(self,val):
 			self.root.setValue(val)
-			self.root.setHeight(1)
+			self.root.setHeight(0)
 			self.root.setSize(1)
 			self.root.setLeft(AVLNode(None))
 			self.root.left.setParent(self.root)
@@ -229,28 +230,30 @@ class AVLTreeList(object):
 				insertRec(self, i, val,node.left,flag)
 			else: 
 				node.size+=1
-				insertRec(self, i-(node.left.size+1), val,node.right,flag)
-			node.setHeight(max(node.left.height,node.right.height)) #set new height if needed
+				insertRec(self, i-1-(node.left.size), val,node.right,flag)
+			a=max(node.left.height,node.right.height)
+			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 			BF=node.left.height-node.right.height
 			if abs(BF)>=2:
 				if (node.left.height-node.right.height)>1: #BF=+2
 					if (node.left.left.height-node.left.right.height)==1: #BF of left son is +1
 						self.rotateRight(node,node.left)
-						flag=True
 					else: #BF of the left son is -1
-						flag=True #left then right
-				elif (node.left.height-node.right.height)-1: #BF=-2
+						self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
+				elif (node.left.height-node.right.height)<-1: #BF=-2
 					if (node.right.left.height-node.right.right.height)==-1: #BF of right son is -1
 						self.rotateLeft(node,node.right)
-						flag=True
 					else: #BF of the right son is +1
-						flag=True #right then left
+						self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
+				flag=True #a rotation took place
+			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 			return flag
 		flagRebalance=False 
 		if self.empty(): 
 			self.createRoot(val)
 		else:
 			insertRec(self,i,val,self.root,flagRebalance)
+		
 		return -1
 
 
@@ -306,9 +309,8 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
 	def length(self):
-		if self.root!=None:
-			return self.root.size
-		return 0
+		return self.root.size
+		
 	"""splits the list at the i'th index
 
 	@type i: int
@@ -353,16 +355,22 @@ class AVLTreeList(object):
 	@returns: None
 	"""
 
-	def rotateRight(self,parent,leftSon): 
+	def rotateRight(self,parent,leftSon): 	
 		parent.left=leftSon.right
 		parent.left.setParent(parent)
 		leftSon.right=parent
-		leftSon.right.setParent(parent.parent)
-		if parent.parent.left==parent: #parent is a left son
+		if parent==self.root: #AVL "criminal" is the tree's root
+			self.root=leftSon
+			leftSon.setParent(None)
+		elif parent.parent.left==parent: #parent is a left son
 			parent.parent.left=leftSon
+			leftSon.setParent(parent.parent)
 		else: #parent is a right son
 			parent.parent.right=leftSon
+			leftSon.setParent(parent.parent)
 		parent.setParent(leftSon)
+		parent.setSize(1+parent.left.size+parent.right.size)
+		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
 		return None
 	
 	"""right rotation to balance the list
@@ -380,14 +388,95 @@ class AVLTreeList(object):
 	def rotateLeft(self,parent,rightSon): 
 		parent.right=rightSon.left
 		parent.right.setParent(parent)
-		rightSon.right=parent
-		rightSon.right.setParent(parent.parent)
-		if parent.parent.left==parent: #parent is a left son
+		rightSon.left=parent
+		if self.root==parent:
+			self.root=rightSon
+			rightSon.setParent(None)
+		elif parent.parent.left==parent: #parent is a left son
 			parent.parent.left=rightSon
+			rightSon.setParent(parent.parent)
 		else: #parent is a right son
 			parent.parent.right=rightSon
+			rightSon.setParent(parent.parent)
 		parent.setParent(rightSon)
+		parent.setSize(1+parent.left.size+parent.right.size)
+		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
 		return None
+
+	"""left then right rotation to balance the list
+
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==2
+	@param parent: the old parent which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftSon.left.height-leftSon.right.height==-1
+	@param parent: the old left son which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftRightSon.left.height-leftRightSon.right.height==1
+	@param parent: the right son of the left son which we need to rotate for balancing
+	@rtype: AVLNode
+	@returns: None
+	"""
+
+	def rotateLeftThenRight(self,parent,leftSon,leftRightSon):
+		parent.left=leftRightSon.right
+		parent.left.setParent(parent)
+		leftSon.right=leftRightSon.left
+		leftSon.right.setParent(leftSon)
+		leftRightSon.left=leftSon
+		leftSon.setParent(leftRightSon)
+		leftRightSon.right=parent
+		if self.root==parent: #if parent is root
+			self.root=leftRightSon
+			leftRightSon.setParent(None)		
+		elif parent.parent.left==parent: #if parent is left son
+			parent.parent.left=leftRightSon
+			leftRightSon.setParent(parent.parent)
+		else:
+			parent.parent.right=leftRightSon
+			leftRightSon.setParent(parent.parent)
+		parent.setParent(leftRightSon)
+		parent.setSize(1+parent.left.size+parent.right.size)
+		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
+		leftRightSon.setSize(1+leftRightSon.left.size+leftRightSon.right.size)
+		return None
+
+	"""right then left rotation to balance the list
+
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==-2
+	@param parent: the old parent which we need to rotate for balancing
+	@type rightSon: AVLNode
+	@pre: rightSon.left.height-rightSon.right.height==1
+	@param parent: the old left son which we need to rotate for balancing
+	@type rightSon: AVLNode
+	@pre: rightLeftSon.left.height-rightLeftSon.right.height==-1
+	@param parent: the left son of the right son which we need to rotate for balancing
+	@rtype: AVLNode
+	@returns: None
+	"""
+
+	def rotateRightThenLeft(self,parent,rightSon,rightLeftSon):
+		parent.right=rightLeftSon.left
+		parent.right.setParent(parent)
+		rightSon.left=rightLeftSon.right
+		rightSon.left.setParent(rightSon)
+		rightLeftSon.right=rightSon
+		rightSon.setParent(rightLeftSon)
+		rightLeftSon.left=parent
+		if self.root==parent: #if parent is root
+			self.root=rightLeftSon
+			rightLeftSon.setParent(None)		
+		elif parent.parent.left==parent: #if parent is left son
+			parent.parent.left=rightLeftSon
+			rightLeftSon.setParent(parent.parent)
+		else:
+			parent.parent.right=rightLeftSon
+			rightLeftSon.setParent(parent.parent)
+		parent.setParent(rightLeftSon)
+		parent.setSize(1+parent.left.size+parent.right.size)
+		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
+		rightLeftSon.setSize(1+rightLeftSon.left.size+rightLeftSon.right.size)
 
 	"""returns the root of the tree representing the list
 
@@ -400,15 +489,28 @@ class AVLTreeList(object):
 
 def main():
 	mytree= AVLTreeList()
-	print(mytree.empty())
-	mytree.insert(0,5)
-	mytree.insert(1,6)
-	mytree.insert(2,7)
-	print(mytree.root.value)
-	# mytree.insert(3,8)
-	# mytree.insert(1,9)
-	# mytree.insert(0,1)
-	# mytree.insert(6,6)
+	for i in range(32):
+		mytree.insert(0,i)
+	for i in range(32-1):
+		mytree.insert(0,i)
+	print("length is " ,mytree.length())
+	print("root size is",mytree.root.size)
+	print("left root size",mytree.root.left.size)
+	print("right root size",mytree.root.right.size)
+	print("root height",mytree.root.height)
+	print("root" ,mytree.root.value)
+	print(mytree.listToArray())
+	# print(mytree.root.right.left.value)
+	# print(mytree.root.right.right.value)
+	# print(mytree.listToArray())
+	# print(mytree.listToArray())
+	# ##ok
+	# print(mytree.listToArray())
+	# print(mytree.root.value)
+	# mytree.insert(1,13)
+	# print(mytree.listToArray())
+	# print(mytree.listToArray())
+	# mytree.insert(6,30)
 	# print(mytree.listToArray())
 	# print(mytree.length())
 	# print(mytree.root.left.size)
