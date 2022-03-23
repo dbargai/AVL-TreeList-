@@ -143,8 +143,8 @@ class AVLTreeList(object):
 	"""
 	def __init__(self):
 		self.root = AVLNode(None)
-		self.first= None
-		self.last= None
+		self.firstitem= None
+		self.lastitem= None
 		# add your fields here
 
 
@@ -208,6 +208,8 @@ class AVLTreeList(object):
 			self.root.left.setParent(self.root)
 			self.root.setRight(AVLNode(None))
 			self.root.right.setParent(self.root)
+			self.firstitem=val
+			self.lastitem=val
 
 	
 	"""inserts val at position i in the list
@@ -222,15 +224,19 @@ class AVLTreeList(object):
 	"""
 	def insert(self, i, val):
 		
-		def insertRec(self, i, val,node,flag): #recursion 
+		def insertRec(self, i, val,node,flag,index): #recursion 
 			if not node.isRealNode():
 				self.createNode(node,val)
+				if index==self.length()-1: #maintain first and last pointers
+					self.lastitem=val
+				if index==0:
+					self.firstitem=val
 			elif i<=node.left.size:
 				node.size+=1
-				flag=insertRec(self, i, val,node.left,flag)
+				flag=insertRec(self, i, val,node.left,flag,index)
 			else: 
 				node.size+=1
-				flag=insertRec(self, i-1-(node.left.size), val,node.right,flag)
+				flag=insertRec(self, i-1-(node.left.size), val,node.right,flag,index)
 			a=max(node.left.height,node.right.height)
 			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 			BF=node.left.height-node.right.height
@@ -252,7 +258,7 @@ class AVLTreeList(object):
 		if self.empty(): 
 			self.createRoot(val)
 		else:
-			flagRebalance=insertRec(self,i,val,self.root,flagRebalance)
+			flagRebalance=insertRec(self,i,val,self.root,flagRebalance,i)
 		
 		return 1 if flagRebalance else 0
 
@@ -275,7 +281,7 @@ class AVLTreeList(object):
 	@returns: the value of the first item, None if the list is empty
 	"""
 	def first(self):
-		return self.first
+		return self.firstitem
 
 	"""returns the value of the last item in the list
 
@@ -283,7 +289,7 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
 	def last(self):
-		return self.last
+		return self.lastitem
 
 	"""returns an array representing list 
 
@@ -496,7 +502,6 @@ def main():
 	# print("root height",mytree.root.height)
 	# print("root" ,mytree.root.value)
 	# print(mytree.listToArray())
-	print(mytree.insert(0,0))
 	print(mytree.insert(0,1))
 	print(mytree.insert(0,2))
 	print(mytree.insert(0,2))
@@ -508,10 +513,15 @@ def main():
 	print(mytree.insert(0,2))
 	print(mytree.insert(9,2))
 	print(mytree.insert(10,2))
-	print(mytree.insert(11,2))
+	print(mytree.insert(11,11))
+	print(mytree.insert(12,12))
+	print(mytree.insert(0,100))
+	print(mytree.insert(14,14))
 	# print(mytree.root.right.left.value)
 	# print(mytree.root.right.right.value)
-	# print(mytree.listToArray())
+	print(mytree.listToArray())
+	print(mytree.last())
+	print(mytree.first())
 	# print(mytree.listToArray())
 	# ##ok
 	# print(mytree.listToArray())
