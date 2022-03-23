@@ -224,44 +224,62 @@ class AVLTreeList(object):
 	"""
 	def insert(self, i, val):
 		
-		def insertRec(self, i, val,node,flag,index): #recursion 
-			if not node.isRealNode():
-				self.createNode(node,val)
-				if index==self.length()-1: #maintain first and last pointers
-					self.lastitem=val
-				if index==0:
-					self.firstitem=val
-			elif i<=node.left.size:
-				node.size+=1
-				flag=insertRec(self, i, val,node.left,flag,index)
-			else: 
-				node.size+=1
-				flag=insertRec(self, i-1-(node.left.size), val,node.right,flag,index)
-			a=max(node.left.height,node.right.height)
-			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-			BF=node.left.height-node.right.height
-			if abs(BF)>=2:
-				if (node.left.height-node.right.height)>1: #BF=+2
-					if (node.left.left.height-node.left.right.height)==1: #BF of left son is +1
-						self.rotateRight(node,node.left)
-					else: #BF of the left son is -1
-						self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
-				elif (node.left.height-node.right.height)<-1: #BF=-2
-					if (node.right.left.height-node.right.right.height)==-1: #BF of right son is -1
-						self.rotateLeft(node,node.right)
-					else: #BF of the right son is +1
-						self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
-				flag=True #a rotation took place
-			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-			return flag
-		flagRebalance=[]
+		if i==self.length(): #maintain first and last pointers
+			self.lastitem=val
+		if i==0:
+			self.firstitem=val
+		flagRebalance=False
 		if self.empty(): 
 			self.createRoot(val)
 		else:
-			flagRebalance=insertRec(self,i,val,self.root,flagRebalance,i)
+			flagRebalance= self.insertRec(i,val,self.root,flagRebalance)
 		
 		return 1 if flagRebalance else 0
 
+	"""inserts val using recursion
+
+	@type i: int
+	@pre: 0 <= i <= self.length()
+	@param i: The intended index in the list to which we insert val
+	@type val: str
+	@param val: the value we insert
+	@rtype: list
+	@returns: the number of rebalancing operation due to AVL rebalancing
+	"""
+
+	def insertRec(self, i, val,node,flag): #recursion 
+		if not node.isRealNode():
+			self.createNode(node,val)
+		
+		elif i<=node.left.size:
+			node.size+=1
+			flag=self.insertRec(i, val ,node.left,flag)
+		else: 
+
+			node.size+=1
+			flag=self.insertRec(i-1-(node.left.size), val ,node.right,flag)
+		
+		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
+		BF=node.left.height-node.right.height
+		
+		if abs(BF)>=2:
+			
+			if (node.left.height-node.right.height)>1: #BF=+2
+				if (node.left.left.height-node.left.right.height)==1: #BF of left son is +1
+					self.rotateRight(node,node.left)
+				else: #BF of the left son is -1
+					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
+			
+			elif (node.left.height-node.right.height)<-1: #BF=-2
+				if (node.right.left.height-node.right.right.height)==-1: #BF of right son is -1
+					self.rotateLeft(node,node.right)
+				else: #BF of the right son is +1
+					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
+
+			flag=True #a rotation took place
+		
+		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
+		return flag
 
 	"""deletes the i'th item in the list
 
