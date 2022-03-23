@@ -2,7 +2,7 @@
 #id1      - 208772715 
 #name1    - Dvir Bargai 
 #id2      - 208992883
-#name2    - Or Shemesh  
+#name2    - Or Shemesh 
 
 
 
@@ -27,7 +27,7 @@ class AVLNode(object):
 	@returns: the left child of self, None if there is no left child
 	"""
 	def getLeft(self):
-		return None
+		return self.left
 
 
 	"""returns the right child
@@ -36,7 +36,7 @@ class AVLNode(object):
 	@returns: the right child of self, None if there is no right child
 	"""
 	def getRight(self):
-		return None
+		return self.right
 
 	"""returns the parent 
 
@@ -44,7 +44,7 @@ class AVLNode(object):
 	@returns: the parent of self, None if there is no parent
 	"""
 	def getParent(self):
-		return None
+		return self.parent
 
 	"""return the value
 
@@ -52,7 +52,7 @@ class AVLNode(object):
 	@returns: the value of self, None if the node is virtual
 	"""
 	def getValue(self):
-		return None
+		return self.value
 
 	"""returns the height
 
@@ -60,7 +60,7 @@ class AVLNode(object):
 	@returns: the height of self, -1 if the node is virtual
 	"""
 	def getHeight(self):
-		return -1
+		return self.height
 
 	"""sets left child
 
