@@ -13,13 +13,15 @@ class AVLNode(object):
 
 	@type value: str
 	@param value: data of your node
+
+	@$height=-1 implies this is a virtual node
 	"""
 	def __init__(self, value):
 		self.value = value
 		self.left = None
 		self.right = None
 		self.parent = None
-		self.height = -1
+		self.height = -1 
 		
 
 	"""returns the left child
@@ -108,8 +110,15 @@ class AVLNode(object):
 	@returns: False if self is a virtual node, True otherwise.
 	"""
 	def isRealNode(self):
-		return False
+		return self.height==-1
 
+
+	# def orTester():
+	# 	lst tests = [AVLNode("3"), AVLNode(""), AVLNode("733")]
+	# 	tests[0].height = 10
+	# 	pass
+
+	# def testGet
 
 
 """
@@ -248,3 +257,4 @@ class AVLTreeList(object):
 		return None
 
 
+	
