@@ -8,6 +8,10 @@
 
 """A class represnting a node in an AVL tree"""
 
+from platform import node
+from turtle import left
+
+
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields. 
 
@@ -20,6 +24,7 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.height = -1
+		self.size = 0
 		
 
 	"""returns the left child
@@ -68,6 +73,7 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setLeft(self, node):
+		self.left=node
 		return None
 
 	"""sets right child
@@ -76,6 +82,7 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setRight(self, node):
+		self.right=node
 		return None
 
 	"""sets parent
@@ -84,6 +91,7 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setParent(self, node):
+		self.parent=node
 		return None
 
 	"""sets value
@@ -92,6 +100,7 @@ class AVLNode(object):
 	@param value: data
 	"""
 	def setValue(self, value):
+		self.value=value
 		return None
 
 	"""sets the balance factor of the node
@@ -100,15 +109,25 @@ class AVLNode(object):
 	@param h: the height
 	"""
 	def setHeight(self, h):
+		self.height=h
 		return None
+	"""sets the size of the node
 
+	@type size: int
+	@param size: the size of the sub-tree 
+	"""
+	def setSize(self, size):
+		self.size=size
+		return None
 	"""returns whether self is not a virtual node 
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
 	"""
 	def isRealNode(self):
-		return False
+		if self.left==None or self.right==None:
+			return False
+		return True
 
 
 
@@ -123,7 +142,9 @@ class AVLTreeList(object):
 
 	"""
 	def __init__(self):
-		self.root = None
+		self.root = AVLNode(None)
+		self.first= None
+		self.last= None
 		# add your fields here
 
 
@@ -133,7 +154,9 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		return None
+		if self.length()==0:
+			return True
+		return False
 
 
 	"""retrieves the value of the i'th item in the list
@@ -147,6 +170,45 @@ class AVLTreeList(object):
 	def retrieve(self, i):
 		return None
 
+	"""creates a node in a specific index with two virtual leaves
+
+	@type node: AVLNode
+	@pre: 
+	@param node: the "virtual" node from which we create the new real node
+	@type val: any object
+	@pre: 
+	@param val: the value of the new node we create  
+	@rtype: None
+	@returns: None
+	"""
+	def createNode(self,node,val):
+		node.setValue(val)
+		node.setLeft(AVLNode(None))
+		node.left.setParent(self)
+		node.setRight(AVLNode(None))
+		node.right.setParent(self)
+		node.size+=1
+		return None
+
+	
+	"""creates a root when the tree is empty
+
+	@type val: any object
+	@pre: 
+	@param val: the value of the new node we create  
+	@rtype: None
+	@returns: None
+	"""
+	def createRoot(self,val):
+			self.root.setValue(val)
+			self.root.setHeight(1)
+			self.root.setSize(1)
+			self.root.setLeft(AVLNode(None))
+			self.root.left.setParent(self.root)
+			self.root.setRight(AVLNode(None))
+			self.root.right.setParent(self.root)
+
+	
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -158,6 +220,37 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def insert(self, i, val):
+		
+		def insertRec(self, i, val,node,flag): #recursion 
+			if not node.isRealNode():
+				self.createNode(node,val)
+			elif i<=node.left.size:
+				node.size+=1
+				insertRec(self, i, val,node.left,flag)
+			else: 
+				node.size+=1
+				insertRec(self, i-(node.left.size+1), val,node.right,flag)
+			node.setHeight(max(node.left.height,node.right.height)) #set new height if needed
+			BF=node.left.height-node.right.height
+			if abs(BF)>=2:
+				if (node.left.height-node.right.height)>1: #BF=+2
+					if (node.left.left.height-node.left.right.height)==1: #BF of left son is +1
+						self.rotateRight(node,node.left)
+						flag=True
+					else: #BF of the left son is -1
+						flag=True #left then right
+				elif (node.left.height-node.right.height)-1: #BF=-2
+					if (node.right.left.height-node.right.right.height)==-1: #BF of right son is -1
+						self.rotateLeft(node,node.right)
+						flag=True
+					else: #BF of the right son is +1
+						flag=True #right then left
+			return flag
+		flagRebalance=False 
+		if self.empty(): 
+			self.createRoot(val)
+		else:
+			insertRec(self,i,val,self.root,flagRebalance)
 		return -1
 
 
@@ -194,8 +287,18 @@ class AVLTreeList(object):
 	@rtype: list
 	@returns: a list of strings representing the data structure
 	"""
-	def listToArray(self):
-		return None
+	def listToArray(self): #Use inorder recursion to append each node to the array
+		array = []
+		def listToArrayRec(Node,array):
+			if Node.size == 0:
+				return None
+			listToArrayRec(Node.left,array)
+			array.append(Node.value)
+			listToArrayRec(Node.right,array)
+			return None
+		
+		listToArrayRec(self.root,array)
+		return array
 
 	"""returns the size of the list 
 
@@ -203,8 +306,9 @@ class AVLTreeList(object):
 	@returns: the size of the list
 	"""
 	def length(self):
-		return None
-
+		if self.root!=None:
+			return self.root.size
+		return 0
 	"""splits the list at the i'th index
 
 	@type i: int
@@ -237,7 +341,53 @@ class AVLTreeList(object):
 	def search(self, val):
 		return None
 
+	"""right rotation to balance the list
 
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==2
+	@param parent: the old parent which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftSon.left.height-leftSon.right.height==1
+	@param parent: the old left son which we need to rotate for balancing
+	@rtype: None
+	@returns: None
+	"""
+
+	def rotateRight(self,parent,leftSon): 
+		parent.left=leftSon.right
+		parent.left.setParent(parent)
+		leftSon.right=parent
+		leftSon.right.setParent(parent.parent)
+		if parent.parent.left==parent: #parent is a left son
+			parent.parent.left=leftSon
+		else: #parent is a right son
+			parent.parent.right=leftSon
+		parent.setParent(leftSon)
+		return None
+	
+	"""right rotation to balance the list
+
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==-2
+	@param parent: the old parent which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftSon.left.height-leftSon.right.height==1
+	@param parent: the old left son which we need to rotate for balancing
+	@rtype: None
+	@returns: None
+	"""
+
+	def rotateLeft(self,parent,rightSon): 
+		parent.right=rightSon.left
+		parent.right.setParent(parent)
+		rightSon.right=parent
+		rightSon.right.setParent(parent.parent)
+		if parent.parent.left==parent: #parent is a left son
+			parent.parent.left=rightSon
+		else: #parent is a right son
+			parent.parent.right=rightSon
+		parent.setParent(rightSon)
+		return None
 
 	"""returns the root of the tree representing the list
 
@@ -248,3 +398,21 @@ class AVLTreeList(object):
 		return None
 
 
+def main():
+	mytree= AVLTreeList()
+	print(mytree.empty())
+	mytree.insert(0,5)
+	mytree.insert(1,6)
+	mytree.insert(2,7)
+	print(mytree.root.value)
+	# mytree.insert(3,8)
+	# mytree.insert(1,9)
+	# mytree.insert(0,1)
+	# mytree.insert(6,6)
+	# print(mytree.listToArray())
+	# print(mytree.length())
+	# print(mytree.root.left.size)
+	# print(mytree.root.right.size)	
+	
+
+main()
