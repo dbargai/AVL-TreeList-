@@ -127,9 +127,7 @@ class AVLNode(object):
 	@returns: False if self is a virtual node, True otherwise.
 	"""
 	def isRealNode(self):
-		if self.left==None or self.right==None:
-			return False
-		return True
+		return self.left!=None or self.right!=None
 
 
 	# def orTester():
