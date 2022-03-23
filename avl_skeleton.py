@@ -227,10 +227,10 @@ class AVLTreeList(object):
 				self.createNode(node,val)
 			elif i<=node.left.size:
 				node.size+=1
-				insertRec(self, i, val,node.left,flag)
+				flag=insertRec(self, i, val,node.left,flag)
 			else: 
 				node.size+=1
-				insertRec(self, i-1-(node.left.size), val,node.right,flag)
+				flag=insertRec(self, i-1-(node.left.size), val,node.right,flag)
 			a=max(node.left.height,node.right.height)
 			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 			BF=node.left.height-node.right.height
@@ -248,13 +248,13 @@ class AVLTreeList(object):
 				flag=True #a rotation took place
 			node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 			return flag
-		flagRebalance=False 
+		flagRebalance=[]
 		if self.empty(): 
 			self.createRoot(val)
 		else:
-			insertRec(self,i,val,self.root,flagRebalance)
+			flagRebalance=insertRec(self,i,val,self.root,flagRebalance)
 		
-		return -1
+		return 1 if flagRebalance else 0
 
 
 	"""deletes the i'th item in the list
@@ -275,7 +275,7 @@ class AVLTreeList(object):
 	@returns: the value of the first item, None if the list is empty
 	"""
 	def first(self):
-		return None
+		return self.first
 
 	"""returns the value of the last item in the list
 
@@ -283,7 +283,7 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
 	def last(self):
-		return None
+		return self.last
 
 	"""returns an array representing list 
 
@@ -484,22 +484,31 @@ class AVLTreeList(object):
 	@returns: the root, None if the list is empty
 	"""
 	def getRoot(self):
-		return None
+		return self.root
 
 
 def main():
 	mytree= AVLTreeList()
-	for i in range(32):
-		mytree.insert(0,i)
-	for i in range(32-1):
-		mytree.insert(0,i)
-	print("length is " ,mytree.length())
-	print("root size is",mytree.root.size)
-	print("left root size",mytree.root.left.size)
-	print("right root size",mytree.root.right.size)
-	print("root height",mytree.root.height)
-	print("root" ,mytree.root.value)
-	print(mytree.listToArray())
+	# print("length is " ,mytree.length())
+	# print("root size is",mytree.root.size)
+	# print("left root size",mytree.root.left.size)
+	# print("right root size",mytree.root.right.size)
+	# print("root height",mytree.root.height)
+	# print("root" ,mytree.root.value)
+	# print(mytree.listToArray())
+	print(mytree.insert(0,0))
+	print(mytree.insert(0,1))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(0,2))
+	print(mytree.insert(9,2))
+	print(mytree.insert(10,2))
+	print(mytree.insert(11,2))
 	# print(mytree.root.right.left.value)
 	# print(mytree.root.right.right.value)
 	# print(mytree.listToArray())
