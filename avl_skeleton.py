@@ -8,7 +8,9 @@
 
 """A class represnting a node in an AVL tree"""
 
+from operator import attrgetter
 from platform import node
+from tkinter import N
 from turtle import left
 
 
@@ -17,7 +19,7 @@ class AVLNode(object):
 
 	@type value: str
 	@param value: data of your node
-
+	@inv index in list = $left.size+1
 	@$height=-1 implies this is a virtual node
 	"""
 	def __init__(self, value):
@@ -68,6 +70,25 @@ class AVLNode(object):
 	"""
 	def getHeight(self):
 		return self.height
+
+	"""" returns the size
+
+	@rtype: int
+	@returns: the size of self
+	"""
+	def getSize(self):
+		return self.size
+	
+	
+	""" returns the Balance Factor
+		@rtype: int
+		@returns: the Balance Factor of self
+		@pre: self represent a "Real Node"
+	"""	
+	def getBF(self):
+		return self.getLeft().getHeight() - self.getRight().getHeight()
+
+
 
 	"""sets left child
 
@@ -164,7 +185,8 @@ class AVLTreeList(object):
 		if self.length()==0:
 			return True
 		return False
-
+	
+	
 
 	"""retrieves the value of the i'th item in the list
 
@@ -172,10 +194,30 @@ class AVLTreeList(object):
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
 	@rtype: str
-	@returns: the the value of the i'th item in the list
+	@returns: the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		return None
+		return self.retrieve_node(i).value
+
+	"""retrieves the i'th node in the list
+
+	@type i: int
+	@pre: 0 <= i < self.length()
+	@param i: index in the list
+	@rtype: AVLNode
+	@returns: the node of the i'th item in the list
+	"""
+	def retrieve_node(self, i):
+		node=self.getRoot()
+		while i!=node.left.size: #loop expects virtual node to exist and have size=0
+			if node.left.size >i:
+				node=node.left
+			else:
+				i = i-node.left.size-1
+				node=node.right
+		return node
+
+
 
 	"""creates a node in a specific index with two virtual leaves
 
@@ -362,7 +404,55 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
 	def concat(self, lst):
+		node = None
+		middle = self.last
+		self.delete(self.length-1)
+		if self.length > lst.length:
+			node=self.findMaximalNodeByHeight(lst.height)
+		else:
+			node=self.findMinimalNodeByHeight(self.height)
+			self.concat_redirect(middle, lst.getRoot(),node)
+		
+		
 		return None
+
+	def rebalance(self, start_node):
+		while (start_node !=None):
+			if start_node.getBF()==-2:
+				if self.getright()==1:
+					self.rotateLeft()
+
+	"""returns minimal-index node with height<=h
+	@rtype: AVLNodes
+	@pre: 0 ≤ h ≤ self.root.height
+	@type h: int
+	"""
+	def findMinimalNodeByHeight(self, h):
+		node = self.root
+		while node.height>h:
+			node=node.left
+		return node
+
+
+	"""returns maximal-index node with height<=h
+	@rtype: AVLNodes
+	@pre: 0 ≤ h ≤ self.root.height
+	@type h: int
+	"""
+	def findMaximalNodeByHeight(self, h):
+		node = self.root
+		while node.height>h:
+			node=node.right
+		return node
+	
+	def concat_redirect(self, mid, newRoot, minNode):
+		mid.setLeft(self.getRoot)
+		mid.setRight(minNode)
+		self.getRoot().setParent(minNode.getParent())
+		mid.setParent(minNode.getParent())
+		minNode.setParent(mid)
+		self.root = newRoot
+
 
 	"""searches for a *value* in the list
 
@@ -561,4 +651,68 @@ def main():
 	# print(mytree.root.right.size)	
 	
 
-main()
+#main()
+
+
+def testRetrieve():
+	### First Tree: [a,b,c,d,e,f,g,h,i]:
+	### Create List of AVLNodes:
+	nodes = [
+			AVLNode("f"),
+			AVLNode("b"),
+			AVLNode("h"), 
+			AVLNode("a"),
+			AVLNode("d"),
+			AVLNode("g"),
+			AVLNode("i"),
+			AVLNode("c"), 
+			AVLNode("e")]
+
+	### Relate nodes to each other:
+	nodes[0].left=nodes[1]
+	nodes[0].right=nodes[2]
+	nodes[1].left=nodes[3]
+	nodes[1].right=nodes[4]
+	nodes[2].left=nodes[5]
+	nodes[2].right=nodes[6]
+	nodes[4].left=nodes[7]
+	nodes[4].right=nodes[8]
+
+	### set size field which is critical for retrieve:
+	nodes[0].setSize(9)
+	nodes[1].setSize(5)
+	nodes[2].setSize(3)
+	nodes[3].setSize(1)
+	nodes[4].setSize(3)
+	nodes[5].setSize(1)
+	nodes[6].setSize(1)
+	nodes[7].setSize(1)
+	nodes[8].setSize(1)
+
+	### set virtual children for leaves:
+	for i in [3,5,6,7,8]:
+		nodes[i].setLeft(AVLNode(None))
+		nodes[i].setRight(AVLNode(None))
+	
+	### Create AVLTree with nodes[0] as root
+	avl1 = AVLTreeList()
+	avl1.root = nodes[0]
+	
+	### Test retrieve for each element in list:
+	if (avl1.retrieve(0).value!="a" or
+		avl1.retrieve(1).value!="b" or
+		avl1.retrieve(2).value!="c" or
+		avl1.retrieve(3).value!="d" or
+		avl1.retrieve(4).value!="e" or
+		avl1.retrieve(5).value!="f" or
+		avl1.retrieve(6).value!="g" or
+		avl1.retrieve(7).value!="h" or
+		avl1.retrieve(8).value!="i"):
+		print("Error in Retrive 1")
+	############# End Testcase 1 ##############
+
+def test
+
+
+
+testRetrieve()
