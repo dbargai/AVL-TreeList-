@@ -151,14 +151,42 @@ class AVLNode(object):
 	def isRealNode(self):
 		return self.left!=None or self.right!=None
 
-	"""computes the balance factor of a given node 
+	"""returns whether self is a leaf
 
-	@rtype: int
-	@returns: height of left son minus height of right son
+	@rtype: bool
+	@returns: True if self is a leaf node, False otherwise.
 	"""
-	def computeBF(self):
-		a=self.left.getHeight()-self.right.getHeight()
-		return self.left.getHeight()-self.right.getHeight()
+	def isLeaf(self):
+		if self.left.isRealNode() or self.right.isRealNode():
+			return False
+		return True
+
+	
+	"""returns whether self is has one real child
+
+	@rtype: bool
+	@returns: True if self has one real child, False otherwise.
+	"""
+	def isMediumNode(self):
+		cnt=0
+		if self.left.isRealNode():
+			cnt+=1
+		if self.right.isRealNode():
+			cnt+=1
+		if cnt==1: 
+			return True
+		return False
+
+	"""returns the medium node's real child 
+	@pre: node.isMediumNode()==True
+	@rtype: AVLNode
+	@returns: The node of the real child of self.
+	"""
+	def realChild(self):
+		if self.left.isRealNode():
+			return self.left
+		else:
+			return self.right
 	# def orTester():
 	# 	lst tests = [AVLNode("3"), AVLNode(""), AVLNode("733")]
 	# 	tests[0].height = 10
@@ -268,7 +296,31 @@ class AVLTreeList(object):
 			self.firstitem=val
 			self.lastitem=val
 
-	
+	"""deletes a node and turn him to "virtual Node"
+
+	@type Node: AVLNode
+	@pre: Node is a leaf 
+	@rtype: None
+	@returns: None
+	"""
+	def deleteNode(self,node):
+		node.setValue(None)
+		node.setLeft(None)
+		node.setRight(None)
+		node.setHeight(-1)
+		node.setSize(0)
+		return None
+
+	def deleteMiddleNode(self,node):
+		parent=node.getParent()
+		if parent.left==node: #node is a left son	
+			parent.setLeft(node.realChild())
+			parent.left.setParent(parent)
+		else: #node is a right son
+			parent.setRight(node.realChild())
+			node.right.setParent(parent)
+		return None
+
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -317,17 +369,17 @@ class AVLTreeList(object):
 			flag=self.insertRec(i-1-(node.left.size), val ,node.right,flag)
 		
 		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-		BF=node.getBF()
+		BF=node.computeBF()
 		if abs(BF)>=2:
 			
 			if (BF)>1: #BF=+2
-				if node.left.getBF()==1: #BF of left son is +1
+				if node.left.computeBF()==1: #BF of left son is +1
 					self.rotateRight(node,node.left)
 				else: #BF of the left son is -1
 					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
 			
 			else: #BF=-2
-				if node.right.getBF()==-1: #BF of right son is -1
+				if node.right.computeBF()==-1: #BF of right son is -1
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
@@ -346,7 +398,25 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, i):
-		return -1
+		node= self.retrieve_node(i)
+		if node.isLeaf():
+			self.deleteNode(node)
+			parent=node.getParent()
+		elif node.isMediumNode(): #node has one real child
+			if self.getRoot()==node:
+				self.root=node.realChild()
+				self.root.setParent(None)
+				self.size
+			else:
+				self.deleteMiddleNode(node)
+		else: #node has two real children
+			successor=self.retrieve_node(i+1) #physical deleted node
+			parent=successor.getParent() 
+			node.setValue(successor.getValue())
+			self.deleteMiddleNode(successor)
+		return self.rebalancing()
+
+
 
 
 	"""returns the value of the first item in the list
@@ -616,6 +686,7 @@ class AVLTreeList(object):
 
 
 def main():
+	pass
 	mytree= AVLTreeList()
 	print(mytree.insert(0,10))
 	print(mytree.insert(0,9))
@@ -718,8 +789,8 @@ def testRetrieve():
 		print("Error in Retrive 1")
 	############# End Testcase 1 ##############
 
-#def test
+# def test
 
-main()
 
-# testRetrieve()
+
+testRetrieve()
