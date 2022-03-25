@@ -317,17 +317,17 @@ class AVLTreeList(object):
 			flag=self.insertRec(i-1-(node.left.size), val ,node.right,flag)
 		
 		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-		BF=node.computeBF()
+		BF=node.getBF()
 		if abs(BF)>=2:
 			
 			if (BF)>1: #BF=+2
-				if node.left.computeBF()==1: #BF of left son is +1
+				if node.left.getBF()==1: #BF of left son is +1
 					self.rotateRight(node,node.left)
 				else: #BF of the left son is -1
 					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
 			
 			else: #BF=-2
-				if node.right.computeBF()==-1: #BF of right son is -1
+				if node.right.getBF()==-1: #BF of right son is -1
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
@@ -718,8 +718,8 @@ def testRetrieve():
 		print("Error in Retrive 1")
 	############# End Testcase 1 ##############
 
-def test
+#def test
 
+main()
 
-
-testRetrieve()
+# testRetrieve()
