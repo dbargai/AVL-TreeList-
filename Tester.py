@@ -34,24 +34,29 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True, tree1.listToArray()==tree2.listToArray() and tree3.listToArray()==tree4.listToArray()) 
         self.assertEqual(True, tree1.length()==tree2.length() and tree3.length()==tree4.length())         
         self.assertEqual(True, root1.getHeight()==root2.getHeight() and root3.getHeight()==root4.getHeight())  
-        print("Passed basic inserts and rotations")
 
-        def testMediumTreesOperations(self):
-            tree1= AVLTreeList.AVLTreeList()
-            cnt=0
-            for i in range(14,-1,-1):
-                cnt+=tree1.insert(0,i)
-            self.assertEqual(True,tree1.getHeight()==3)
-            self.assertEqual(True,tree1.length()==15)
-            self.assertEqual(True,tree1.listToArray()==[0,1,2,3,4,5,6,7,8,9.10,11,12,13,14])
-            self.assertEqual(True,tree1.first()==0)
-            self.assertEqual(True,tree1.last()==14)
-            self.assertEqual(True.cnt==11)
-            self.assertEqual(True,tree1.getRoot().getValue()=="7")
-            for i in range(15,2**10):
-                tree1.insert(i,i)
-            self.assertEqual(True,tree1.length()==2**10)
-            self.assertEqual(True,tree1.getRoot().getHeight()==9)
+
+    def testMediumTreesOperations(self):
+        tree1= AVLTreeList.AVLTreeList()
+        cnt=0
+        for i in range(14,-1,-1):
+            cnt+=tree1.insert(0,i)
+        self.assertEqual(True,tree1.getRoot().getHeight()==3)
+        self.assertEqual(True,tree1.length()==15)
+        self.assertEqual(True,tree1.listToArray()==[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14])
+        self.assertEqual(True,tree1.first()==0)
+        self.assertEqual(True,tree1.last()==14)
+        self.assertEqual(True,cnt==11)
+        self.assertEqual(True,tree1.getRoot().getValue()==7)
+        for i in range(15,2**10-1):
+            tree1.insert(i,i)
+        self.assertEqual(True,tree1.length()==2**10-1)
+        a=tree1.getRoot().getHeight()
+        self.assertEqual(True,tree1.getRoot().getHeight()==9)
+        self.assertEqual(True,tree1.getRoot().left.getSize()==tree1.getRoot().right.getSize())
+        tree1.insert(1023,1023)
+        self.assertEqual(True,tree1.getRoot().getHeight()==10)
+
 
 
 if __name__ == '__main__':
