@@ -369,17 +369,17 @@ class AVLTreeList(object):
 			flag=self.insertRec(i-1-(node.left.size), val ,node.right,flag)
 		
 		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-		BF=node.computeBF()
+		BF=node.getBF()
 		if abs(BF)>=2:
 			
 			if (BF)>1: #BF=+2
-				if node.left.computeBF()==1: #BF of left son is +1
+				if node.left.getBF()==1: #BF of left son is +1
 					self.rotateRight(node,node.left)
 				else: #BF of the left son is -1
 					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
 			
 			else: #BF=-2
-				if node.right.computeBF()==-1: #BF of right son is -1
+				if node.right.getBF()==-1: #BF of right son is -1
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
@@ -688,45 +688,7 @@ class AVLTreeList(object):
 def main():
 	pass
 	mytree= AVLTreeList()
-	print(mytree.insert(0,10))
-	print(mytree.insert(0,9))
-	print(mytree.insert(0,8))
-	print(mytree.insert(0,7))
-	print(mytree.insert(0,6))
-	print(mytree.insert(0,5))
-	print(mytree.insert(0,4))
-	print(mytree.insert(0,3))
-	print(mytree.insert(0,2))
-	print(mytree.insert(9,11))
-	print("length is " ,mytree.length())
-	print("root size is",mytree.root.size)
-	print("left root size",mytree.root.left.size)
-	print("right root size",mytree.root.right.size)
-	print("root height",mytree.root.height)
-	print("root" ,mytree.root.value)
-	print(mytree.listToArray())
-	print(mytree.insert(10,12))
-	# print(mytree.insert(11,11))
-	# print(mytree.insert(12,12))
-	# print(mytree.insert(0,100))
-	# print(mytree.insert(14,14))
-	# print(mytree.root.right.left.value)
-	# print(mytree.root.right.right.value)
-	print(mytree.listToArray())
-	print(mytree.last())
-	print(mytree.first())
-	# print(mytree.listToArray())
-	# ##ok
-	# print(mytree.listToArray())
-	# print(mytree.root.value)
-	# mytree.insert(1,13)
-	# print(mytree.listToArray())
-	# print(mytree.listToArray())
-	# mytree.insert(6,30)
-	# print(mytree.listToArray())
-	# print(mytree.length())
-	# print(mytree.root.left.size)
-	# print(mytree.root.right.size)	
+	
 	
 
 #main()
@@ -793,4 +755,4 @@ def testRetrieve():
 
 
 
-testRetrieve()
+# testRetrieve()
