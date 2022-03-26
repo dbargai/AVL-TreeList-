@@ -80,6 +80,7 @@ class AVLNode(object):
 	@returns: the height of self, -1 if the node is virtual
 	"""
 	def getHeight(self):
+		a=self.height
 		return self.height
 
 	"""" returns the size
@@ -161,7 +162,42 @@ class AVLNode(object):
 	def isRealNode(self):
 		return self.left!=None or self.right!=None
 
+	"""returns whether self is a leaf
 
+	@rtype: bool
+	@returns: True if self is a leaf node, False otherwise.
+	"""
+	def isLeaf(self):
+		if self.left.isRealNode() or self.right.isRealNode():
+			return False
+		return True
+
+	
+	"""returns whether self is has one real child
+
+	@rtype: bool
+	@returns: True if self has one real child, False otherwise.
+	"""
+	def isMediumNode(self):
+		cnt=0
+		if self.left.isRealNode():
+			cnt+=1
+		if self.right.isRealNode():
+			cnt+=1
+		if cnt==1: 
+			return True
+		return False
+
+	"""returns the medium node's real child 
+	@pre: node.isMediumNode()==True
+	@rtype: AVLNode
+	@returns: The node of the real child of self.
+	"""
+	def realChild(self):
+		if self.left.isRealNode():
+			return self.left
+		else:
+			return self.right
 	# def orTester():
 	# 	lst tests = [AVLNode("3"), AVLNode(""), AVLNode("733")]
 	# 	tests[0].height = 10
@@ -271,7 +307,31 @@ class AVLTreeList(object):
 			self.firstitem=val
 			self.lastitem=val
 
-	
+	"""deletes a node and turn him to "virtual Node"
+
+	@type Node: AVLNode
+	@pre: Node is a leaf 
+	@rtype: None
+	@returns: None
+	"""
+	def deleteNode(self,node):
+		node.setValue(None)
+		node.setLeft(None)
+		node.setRight(None)
+		node.setHeight(-1)
+		node.setSize(0)
+		return None
+
+	def deleteMiddleNode(self,node):
+		parent=node.getParent()
+		if parent.left==node: #node is a left son	
+			parent.setLeft(node.realChild())
+			parent.left.setParent(parent)
+		else: #node is a right son
+			parent.setRight(node.realChild())
+			node.right.setParent(parent)
+		return None
+
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -320,18 +380,17 @@ class AVLTreeList(object):
 			flag=self.insertRec(i-1-(node.left.size), val ,node.right,flag)
 		
 		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-		BF=node.left.height-node.right.height
-		
+		BF=node.getBF()
 		if abs(BF)>=2:
 			
-			if (node.left.height-node.right.height)>1: #BF=+2
-				if (node.left.left.height-node.left.right.height)==1: #BF of left son is +1
+			if (BF)>1: #BF=+2
+				if node.left.getBF()==1: #BF of left son is +1
 					self.rotateRight(node,node.left)
 				else: #BF of the left son is -1
 					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
 			
-			elif (node.left.height-node.right.height)<-1: #BF=-2
-				if (node.right.left.height-node.right.right.height)==-1: #BF of right son is -1
+			else: #BF=-2
+				if node.right.getBF()==-1: #BF of right son is -1
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
@@ -348,7 +407,25 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, i):
-		return -1
+		node= self.retrieve_node(i)
+		if node.isLeaf():
+			self.deleteNode(node)
+			parent=node.getParent()
+		elif node.isMediumNode(): #node has one real child
+			if self.getRoot()==node:
+				self.root=node.realChild()
+				self.root.setParent(None)
+				self.size
+			else:
+				self.deleteMiddleNode(node)
+		else: #node has two real children
+			successor=self.retrieve_node(i+1) #physical deleted node
+			parent=successor.getParent() 
+			node.setValue(successor.getValue())
+			self.deleteMiddleNode(successor)
+		return self.rebalancing()
+
+
 
 
 	"""returns the value of the first item in the list
@@ -643,46 +720,9 @@ class AVLTreeList(object):
 
 
 def main():
+	pass
 	mytree= AVLTreeList()
-	# print("length is " ,mytree.length())
-	# print("root size is",mytree.root.size)
-	# print("left root size",mytree.root.left.size)
-	# print("right root size",mytree.root.right.size)
-	# print("root height",mytree.root.height)
-	# print("root" ,mytree.root.value)
-	# print(mytree.listToArray())
-	print(mytree.insert(0,1))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(0,2))
-	print(mytree.insert(9,2))
-	print(mytree.insert(10,2))
-	print(mytree.insert(11,11))
-	print(mytree.insert(12,12))
-	print(mytree.insert(0,100))
-	print(mytree.insert(14,14))
-	# print(mytree.root.right.left.value)
-	# print(mytree.root.right.right.value)
-	print(mytree.listToArray())
-	print(mytree.last())
-	print(mytree.first())
-	# print(mytree.listToArray())
-	# ##ok
-	# print(mytree.listToArray())
-	# print(mytree.root.value)
-	# mytree.insert(1,13)
-	# print(mytree.listToArray())
-	# print(mytree.listToArray())
-	# mytree.insert(6,30)
-	# print(mytree.listToArray())
-	# print(mytree.length())
-	# print(mytree.root.left.size)
-	# print(mytree.root.right.size)	
+	
 	
 
 #main()
@@ -745,11 +785,15 @@ def testRetrieve():
 		print("Error in Retrive 1")
 	############# End Testcase 1 ##############
 
+<<<<<<< HEAD
 def testConcat():
 	# Testcase 1:
 	tree1 = createTreeFromList(['z','x','w','y',None,None,None])
 	tree2 = createTreeFromList(['a','b','c'])
 	tree1.concat(tree2)
+=======
+# def test
+>>>>>>> main
 
 """This method is for testing ONLY and returns a legal tree created from a given list
 @pre: list of strings which satisfies the following format:
@@ -809,4 +853,4 @@ def createTreeFromList_rec(lst, i, power):
 
 testConcat()
 
-testRetrieve()
+# testRetrieve()
