@@ -383,10 +383,8 @@ class AVLTreeList(object):
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
-
 			flag=True #a rotation took place
 		
-		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 		return flag
 
 	"""deletes the i'th item in the list
@@ -569,6 +567,8 @@ class AVLTreeList(object):
 		parent.setParent(leftSon)
 		parent.setSize(1+parent.left.size+parent.right.size)
 		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		leftSon.setHeight(1+max(leftSon.left.height,leftSon.right.height))
 		return None
 	
 	"""right rotation to balance the list
@@ -599,6 +599,8 @@ class AVLTreeList(object):
 		parent.setParent(rightSon)
 		parent.setSize(1+parent.left.size+parent.right.size)
 		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		rightSon.setHeight(1+max(rightSon.left.height,rightSon.right.height))
 		return None
 
 	"""left then right rotation to balance the list
@@ -637,6 +639,9 @@ class AVLTreeList(object):
 		parent.setSize(1+parent.left.size+parent.right.size)
 		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
 		leftRightSon.setSize(1+leftRightSon.left.size+leftRightSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		leftSon.setHeight(1+max(leftSon.left.height,leftSon.right.height))
+		leftRightSon.setHeight(1+max(leftRightSon.left.height,leftRightSon.right.height))
 		return None
 
 	"""right then left rotation to balance the list
@@ -675,6 +680,9 @@ class AVLTreeList(object):
 		parent.setSize(1+parent.left.size+parent.right.size)
 		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
 		rightLeftSon.setSize(1+rightLeftSon.left.size+rightLeftSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		rightSon.setHeight(1+max(rightSon.left.height,rightSon.right.height))
+		rightLeftSon.setHeight(1+max(rightLeftSon.left.height,rightLeftSon.right.height))
 
 	"""returns the root of the tree representing the list
 
