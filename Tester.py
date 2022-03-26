@@ -2,6 +2,79 @@ import unittest
 import avl_skeleton as AVLTreeList
 import math
 
+
+"""This method is for testing ONLY and returns a legal tree created from a given list
+@pre: list of strings which satisfies the following format:
+	list length is a power of 2 and
+	index 0 is the root,
+	next 2 indexes are the sons of the root,
+	next 4 indexes are the sons of the root's sons
+	and so on by this pattern while a "missing son" will be represented by None
+@post: False if list represents illegal tree, compatible AVLTreeList otherwise
+@rtype: AVLTreeList
+"""
+
+def setFirst(tree):
+    first=tree.getRoot()
+    while first.getLeft().isRealNode():
+        first = first.getLeft()
+    tree.firstitem = first
+
+def setLast(tree):
+    last=tree.getRoot()
+    while last.getRight().isRealNode():
+        last = last.getRight()
+    tree.lastitem = last
+
+
+def createTreeFromList(lst):
+    tree = AVLTreeList.AVLTreeList()
+    root = createTreeFromList_rec(lst,0,0)
+    if root.height>-2:
+        tree.root=root
+        setFirst(tree)
+        setLast(tree)
+        return tree
+        
+    else:
+        print("list does not represent a valid tree")
+        return False
+
+def createTreeFromList_rec(lst, i, power):
+	if(lst[i]==None):
+		#return virtual Node from lst[i]:
+		return AVLTreeList.AVLNode(lst[i])	 
+
+	##calc next index of left son's index, right son will be the following index:
+	nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+
+	if nextIndex>=len(lst):
+		##Create leaf node:
+		node = AVLTreeList.AVLNode(None)
+		node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
+		return node
+
+	left = createTreeFromList_rec(lst, nextIndex, power+1)
+	right = createTreeFromList_rec(lst, nextIndex +1, power+1)
+	if left.getHeight()>-2 and right.getHeight()>-2:
+		if abs(right.height-left.height)>1:
+			node = AVLTreeList.AVLNode(None)
+			node.setHeight(-2)
+			return node
+
+		else:
+			node = AVLTreeList.AVLNode(lst[i])
+			node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
+			left.setParent(node)
+			right.setParent(node)
+			return node
+
+	else:
+		node = AVLTreeList.AVLNode(None)
+		node.setHeight(-2)
+		return node
+
+
 class TestMavnatProject1(unittest.TestCase):
     
     def testInsert_Rotations(self):
@@ -70,130 +143,30 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,tree1.getRoot().getHeight()==10)
         
 
-    def testRetrieve():
-	### First Tree: [a,b,c,d,e,f,g,h,i]:
-	### Create List of AVLNodes:
-        nodes = [
-			AVLTreeList.AVLNode("f"),
-			AVLTreeList.AVLNode("b"),
-			AVLTreeList.AVLNode("h"), 
-			AVLTreeList.AVLNode("a"),
-			AVLTreeList.AVLNode("d"),
-			AVLTreeList.AVLNode("g"),
-			AVLTreeList.AVLNode("i"),
-			AVLTreeList.AVLNode("c"), 
-			AVLTreeList.AVLNode("e")]
-
-        ### Relate nodes to each other:
-        nodes[0].left=nodes[1]
-        nodes[0].right=nodes[2]
-        nodes[1].left=nodes[3]
-        nodes[1].right=nodes[4]
-        nodes[2].left=nodes[5]
-        nodes[2].right=nodes[6]
-        nodes[4].left=nodes[7]
-        nodes[4].right=nodes[8]
-
-        ### set size field which is critical for retrieve:
-        nodes[0].setSize(9)
-        nodes[1].setSize(5)
-        nodes[2].setSize(3)
-        nodes[3].setSize(1)
-        nodes[4].setSize(3)
-        nodes[5].setSize(1)
-        nodes[6].setSize(1)
-        nodes[7].setSize(1)
-        nodes[8].setSize(1)
-
-        ### set virtual children for leaves:
-        for i in [3,5,6,7,8]:
-            nodes[i].setLeft(AVLTreeList.AVLNode(None))
-            nodes[i].setRight(AVLTreeList.AVLNode(None))
+    def testRetrieve(self):
+	### First Tree:        
+        avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
+        self.assertEqual('a', avl2.retrieve(0))
+        self.assertEqual('b', avl2.retrieve(1))
+        self.assertEqual('c', avl2.retrieve(2))
+        self.assertEqual('d', avl2.retrieve(3))
+        self.assertEqual('e', avl2.retrieve(4))
+        self.assertEqual('f', avl2.retrieve(5))
+        self.assertEqual('g', avl2.retrieve(6))
+        self.assertEqual('h', avl2.retrieve(7))
+        self.assertEqual('i', avl2.retrieve(8))
         
-        ### Create AVLTree with nodes[0] as root
-        avl1 = AVLTreeList()
-        avl1.root = nodes[0]
-        
-        ### Test retrieve for each element in list:
-        if (avl1.retrieve(0).value!="a" or
-            avl1.retrieve(1).value!="b" or
-            avl1.retrieve(2).value!="c" or
-            avl1.retrieve(3).value!="d" or
-            avl1.retrieve(4).value!="e" or
-            avl1.retrieve(5).value!="f" or
-            avl1.retrieve(6).value!="g" or
-            avl1.retrieve(7).value!="h" or
-            avl1.retrieve(8).value!="i"):
-            print("Error in Retrive 1")
-        ############# End Testcase 1 ##############
 
-
-
-    # def testConcat():
-	# # Testcase 1:
-	# tree1 = createTreeFromList(['z','x','w','y',None,None,None])
-	# tree2 = createTreeFromList(['a','b','c'])
-	# tree1.concat(tree2)
-
-
-
+    def testConcat(self):
+        tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+        tree2 = createTreeFromList(['a','b','c'])
+        result = tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
 
 
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()
 
 
 
-"""This method is for testing ONLY and returns a legal tree created from a given list
-@pre: list of strings which satisfies the following format:
-	list length is a power of 2 and
-	index 0 is the root,
-	next 2 indexes are the sons of the root,
-	next 4 indexes are the sons of the root's sons
-	and so on by this pattern while a "missing son" will be represented by None
-@post: False if list represents illegal tree, compatible AVLTreeList otherwise
-@rtype: AVLTreeList
-"""
-# def createTreeFromList(lst):
-# 	tree = AVLTreeList.AVLTreeList()
-# 	root = createTreeFromList_rec(lst,0,0)
-# 	if root.height>-2:
-# 		tree.root=root
-#         return tree
-# 	else:
-# 		print("list does not represent a valid tree")
-# 		return False
 
-# def createTreeFromList_rec(lst, i, power):
-# 	if(lst[i]==None):
-# 		#return virtual Node from lst[i]:
-# 		return AVLTreeList.AVLNode(lst[i])	 
-
-# 	##calc next index of left son's index, right son will be the following index:
-# 	nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
-
-# 	if nextIndex>=len(lst):
-# 		##Create leaf node:
-# 		node = AVLTreeList.AVLNode(None)
-# 		node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
-# 		return node
-
-# 	left = createTreeFromList_rec(lst, nextIndex, power+1)
-# 	right = createTreeFromList_rec(lst, nextIndex +1, power+1)
-# 	if left.getHeight()>-2 and right.getHeight()>-2:
-# 		if abs(right.height-left.height)>1:
-# 			node = AVLTreeList.AVLNode(None)
-# 			node.setHeight(-2)
-# 			return node
-
-# 		else:
-# 			node = AVLTreeList.AVLNode(lst[i])
-# 			node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
-# 			left.setParent(node)
-# 			right.setParent(node)
-# 			return node
-
-# 	else:
-# 		node = AVLTreeList.AVLNode(None)
-# 		node.setHeight(-2)
-# 		return node

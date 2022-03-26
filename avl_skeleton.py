@@ -490,17 +490,21 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
 	def concat(self, lst):
+		heightDiff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
 		node = None
-		middle = self.last
-		self.delete(self.length-1)
-		if self.length > lst.length:
-			node=self.findMaximalNodeByHeight(lst.height)
+		middle = self.lastitem
+		self.delete(self.length()-1)
+
+		if self.length() > lst.length():
+			node=self.findMaximalNodeByHeight(lst.getRoot().getHeight())
+			self.concat_redirect(middle, node, lst.getRoot(), node.getParent(), self.getRoot())
+
 		else:
-			node=self.findMinimalNodeByHeight(self.height)
-			self.concat_redirect(middle, lst.getRoot(),node)
-		
-		
-		return None
+			node=self.findMinimalNodeByHeight(self.getRoot().getHeight())
+			self.concat_redirect(middle, self.getRoot(),node, node.getParent(), lst.getRoot())
+		self.rebalance(node)
+		return heightDiff
+
 
 	def rebalance(self, start_node):
 		while (start_node !=None):
@@ -544,12 +548,12 @@ class AVLTreeList(object):
 			node=node.right
 		return node
 	
-	def concat_redirect(self, mid, newRoot, minNode):
-		mid.setLeft(self.getRoot)
-		mid.setRight(minNode)
-		self.getRoot().setParent(minNode.getParent())
-		mid.setParent(minNode.getParent())
-		minNode.setParent(mid)
+	def concat_redirect(self, mid, left, right, parent, newRoot):
+		mid.setLeft(left)
+		mid.setRight(right)
+		left.setParent(mid)
+		right.setParent(mid)
+		mid.setParent(parent)
 		self.root = newRoot
 
 
