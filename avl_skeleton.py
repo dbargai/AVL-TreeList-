@@ -506,22 +506,20 @@ class AVLTreeList(object):
 		while (start_node !=None):
 			if start_node.getBF()==-2:
 				if self.getright().getBF()==1:
-					self.rotateRight()
-					self.rotateLeft()
+					start_node=self.rotateRightThenLeft(start_node, start_node.getRight(), start_node.getLeft())
 				else:
 					#if self.getright().getBF() not in [0,-1]:
 					#	print("Impossible BF")
-					self.rotateLeft
+					start_node=self.rotateLeft(start_node, start_node.getRight())
 			else:
 				#if start_node.getBF()!=2:
 				#	print("Impossible BF")
 				if self.getLeft().getBF()==-1:
-					self.rotateLeft()
-					self.rotateRight()
+					start_node=self.rotateLeftThenRight(start_node, start_node.getLeft(), start_node.getRight())
 				else:
 					#if self.getright().getBF() not in [0,1]:
 					#	print("Impossible BF")
-					self.rotateRight()
+					start_node=self.rotateRight(start_node, start_node.getLeft())
 
 	"""returns minimal-index node with height<=h
 	@rtype: AVLNodes
