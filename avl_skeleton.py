@@ -11,7 +11,9 @@
 from operator import attrgetter
 from platform import node
 from tkinter import N
+from tkinter.messagebox import NO
 from turtle import left
+import math
 
 
 class AVLNode(object):
@@ -30,6 +32,15 @@ class AVLNode(object):
 		self.height = -1
 		self.size = 0
 		
+	def setFields(self, value, left, right, parent, height, size):
+		self.value = value
+		self.left = left
+		self.right = right
+		self.parent = parent
+		self.height = height
+		self.size = size
+	 
+
 
 	"""returns the left child
 	@rtype: AVLNode
@@ -324,10 +335,8 @@ class AVLTreeList(object):
 					self.rotateLeft(node,node.right)
 				else: #BF of the right son is +1
 					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
-
 			flag=True #a rotation took place
 		
-		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
 		return flag
 
 	"""deletes the i'th item in the list
@@ -419,8 +428,23 @@ class AVLTreeList(object):
 	def rebalance(self, start_node):
 		while (start_node !=None):
 			if start_node.getBF()==-2:
-				if self.getright()==1:
+				if self.getright().getBF()==1:
+					self.rotateRight()
 					self.rotateLeft()
+				else:
+					#if self.getright().getBF() not in [0,-1]:
+					#	print("Impossible BF")
+					self.rotateLeft
+			else:
+				#if start_node.getBF()!=2:
+				#	print("Impossible BF")
+				if self.getLeft().getBF()==-1:
+					self.rotateLeft()
+					self.rotateRight()
+				else:
+					#if self.getright().getBF() not in [0,1]:
+					#	print("Impossible BF")
+					self.rotateRight()
 
 	"""returns minimal-index node with height<=h
 	@rtype: AVLNodes
@@ -492,6 +516,8 @@ class AVLTreeList(object):
 		parent.setParent(leftSon)
 		parent.setSize(1+parent.left.size+parent.right.size)
 		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		leftSon.setHeight(1+max(leftSon.left.height,leftSon.right.height))
 		return None
 	
 	"""right rotation to balance the list
@@ -522,6 +548,8 @@ class AVLTreeList(object):
 		parent.setParent(rightSon)
 		parent.setSize(1+parent.left.size+parent.right.size)
 		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		rightSon.setHeight(1+max(rightSon.left.height,rightSon.right.height))
 		return None
 
 	"""left then right rotation to balance the list
@@ -560,6 +588,9 @@ class AVLTreeList(object):
 		parent.setSize(1+parent.left.size+parent.right.size)
 		leftSon.setSize(1+leftSon.left.size+leftSon.right.size)
 		leftRightSon.setSize(1+leftRightSon.left.size+leftRightSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		leftSon.setHeight(1+max(leftSon.left.height,leftSon.right.height))
+		leftRightSon.setHeight(1+max(leftRightSon.left.height,leftRightSon.right.height))
 		return None
 
 	"""right then left rotation to balance the list
@@ -598,6 +629,9 @@ class AVLTreeList(object):
 		parent.setSize(1+parent.left.size+parent.right.size)
 		rightSon.setSize(1+rightSon.left.size+rightSon.right.size)
 		rightLeftSon.setSize(1+rightLeftSon.left.size+rightLeftSon.right.size)
+		parent.setHeight(1+max(parent.left.height,parent.right.height))
+		rightSon.setHeight(1+max(rightSon.left.height,rightSon.right.height))
+		rightLeftSon.setHeight(1+max(rightLeftSon.left.height,rightLeftSon.right.height))
 
 	"""returns the root of the tree representing the list
 
@@ -711,8 +745,68 @@ def testRetrieve():
 		print("Error in Retrive 1")
 	############# End Testcase 1 ##############
 
-def test
+def testConcat():
+	# Testcase 1:
+	tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+	tree2 = createTreeFromList(['a','b','c'])
+	tree1.concat(tree2)
 
+"""This method is for testing ONLY and returns a legal tree created from a given list
+@pre: list of strings which satisfies the following format:
+	list length is a power of 2 and
+	index 0 is the root,
+	next 2 indexes are the sons of the root,
+	next 4 indexes are the sons of the root's sons
+	and so on by this pattern while a "missing son" will be represented by None
+@rtype: AVLTreeList
+"""
 
+def createTreeFromList(lst):
+	tree = AVLTreeList()
+	root = createTreeFromList_rec(lst,0,0)
+	if root.height>-2:
+		tree.root=root
+		return tree
+	else:
+		print("list does not represent a valid tree")
+		return False
+
+def createTreeFromList_rec(lst, i, power):
+	if(lst[i]==None):
+		#return virtual Node from lst[i]:
+		return AVLNode(lst[i])	 
+
+	##calc next index of left son's index, right son will be the following index:
+	nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+
+	if nextIndex>=len(lst):
+		##Create leaf node:
+		node = AVLNode(None)
+		node.setFields(lst[i], AVLNode(None), AVLNode(None), None, 0, 1)
+		return node
+
+	left = createTreeFromList_rec(lst, nextIndex, power+1)
+	right = createTreeFromList_rec(lst, nextIndex +1, power+1)
+	if left.getHeight()>-2 and right.getHeight()>-2:
+		if abs(right.height-left.height)>1:
+			node = AVLNode(None)
+			node.setHeight(-2)
+			return node
+
+		else:
+			node = AVLNode(lst[i])
+			node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
+			left.setParent(node)
+			right.setParent(node)
+			return node
+
+	else:
+		node = AVLNode(None)
+		node.setHeight(-2)
+		return node
+
+#createTreeFromList(["c","b","a",None,"d",None,"e",None,None,None,None,None,None,None, "f"])
+
+testConcat()
 
 testRetrieve()
