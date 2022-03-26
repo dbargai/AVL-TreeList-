@@ -785,15 +785,11 @@ def testRetrieve():
 		print("Error in Retrive 1")
 	############# End Testcase 1 ##############
 
-<<<<<<< HEAD
 def testConcat():
 	# Testcase 1:
 	tree1 = createTreeFromList(['z','x','w','y',None,None,None])
 	tree2 = createTreeFromList(['a','b','c'])
 	tree1.concat(tree2)
-=======
-# def test
->>>>>>> main
 
 """This method is for testing ONLY and returns a legal tree created from a given list
 @pre: list of strings which satisfies the following format:
