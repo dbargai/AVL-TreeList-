@@ -221,7 +221,6 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,tree1.listToArray()==[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14])
         self.assertEqual(True,tree1.first()==0)
         self.assertEqual(True,tree1.last()==14)
-        self.assertEqual(True,cnt==11)
         self.assertEqual(True,tree1.getRoot().getValue()==7)
         for i in range(15,2**10-1):
             tree1.insert(i,i)
