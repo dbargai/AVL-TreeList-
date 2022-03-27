@@ -405,24 +405,41 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, i):
+		cnt_rotations=0
+		if self.length()!=1:
+			if i==self.length()-1:
+				self.lastitem=self.retrieve(i-1)
+			if i==0:
+				self.firstitem=self.retrieve(1)
+		else: #delete the only item and its the root
+			self.lastitem=None
+			self.firstitem=None
 		node= self.retrieve_node(i)
 		if node.isLeaf():
 			self.deleteNode(node)
-			parent=node.getParent()
+			if self.getRoot()!=node:
+				parent=node.getParent()
+			else:
+				parent=node
 		elif node.isMediumNode(): #node has one real child
 			if self.getRoot()==node:
 				self.root=node.realChild()
 				self.root.setParent(None)
-				self.size
 			else:
 				self.deleteMiddleNode(node)
+			parent=node.getParent()
 		else: #node has two real children
 			successor=self.retrieve_node(i+1) #physical deleted node
 			parent=successor.getParent() 
 			node.setValue(successor.getValue())
-			self.deleteMiddleNode(successor)
-		return self.rebalancing()
-
+			self.deleteNode(successor) if successor.isLeaf() else self.deleteMiddleNode(successor)
+		if parent==None: 
+			return 0
+		if parent.getValue()!=None:
+			parent.setSize(parent.left.getSize()+parent.right.getSize()+1)
+			parent.setHeight(1+max(parent.left.getHeight(),parent.right.getHeight()))
+			cnt_rotations=self.rebalance(parent)
+		return cnt_rotations
 
 
 
@@ -504,25 +521,42 @@ class AVLTreeList(object):
 		return heightDiff
 
 
-	def rebalance(self, start_node):
-		while (start_node !=None):
-			if start_node.getBF()==-2:
-				if self.getright().getBF()==1:
-					start_node=self.rotateRightThenLeft(start_node, start_node.getRight(), start_node.getLeft())
-				else:
-					#if self.getright().getBF() not in [0,-1]:
-					#	print("Impossible BF")
-					start_node=self.rotateLeft(start_node, start_node.getRight())
-			else:
-				#if start_node.getBF()!=2:
-				#	print("Impossible BF")
-				if self.getLeft().getBF()==-1:
-					start_node=self.rotateLeftThenRight(start_node, start_node.getLeft(), start_node.getRight())
-				else:
-					#if self.getright().getBF() not in [0,1]:
-					#	print("Impossible BF")
-					start_node=self.rotateRight(start_node, start_node.getLeft())
+	"""rebalancing the tree from a given node to the root
+	@rtype: int
+	@returns: a counter of the number of rotations performed
+	"""
 
+	def rebalance(self, start_node):
+		cnt=0
+		while (start_node !=None):
+			if abs(start_node.getBF())==2: 
+				if start_node.getBF()<0:
+					if start_node.getRight().getBF()==1:
+						start_node=self.rotateRightThenLeft(start_node, start_node.getRight(), start_node.getLeft())
+						cnt+=1
+					else:
+						#if self.getright().getBF() not in [0,-1]:
+						#	print("Impossible BF")
+						start_node=self.rotateLeft(start_node, start_node.getRight())
+						cnt+=1
+				else: #BF is +2
+					#if start_node.getBF()!=2:
+					#	print("Impossible BF")
+					if start_node.getLeft().getBF()==-1:
+						start_node=self.rotateLeftThenRight(start_node, start_node.getLeft(), start_node.getRight())
+						cnt+=1
+					else:
+						#if self.getright().getBF() not in [0,1]:
+						#	print("Impossible BF")
+						start_node=self.rotateRight(start_node, start_node.getLeft())
+						cnt+=1
+			else:
+				start_node.setHeight(1+max(start_node.left.getHeight(),start_node.right.getHeight()))
+
+			start_node.setSize(1 +start_node.left.getSize()+start_node.right.getSize())
+			start_node=start_node.getParent()
+		return cnt
+	
 	"""returns minimal-index node with height<=h
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
