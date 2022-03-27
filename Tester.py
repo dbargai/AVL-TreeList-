@@ -6,6 +6,8 @@ import math
 """returns index of given node in the list
 !!! This method is for testing and does not run on O(1), don't use for class methods
 """
+
+
 def indexOf(node):
     parent = node
     if parent.getParent().getLeft() is parent:
@@ -62,6 +64,8 @@ because it represents an illegal tree:
 """
 
 def createTreeFromList(lst):
+    if len(lst)==0:
+        return AVLTreeList.AVLTreeList()
     tree = AVLTreeList.AVLTreeList()
     root = createTreeFromList_rec(lst,0,0)
     if root.height>-2:
@@ -110,6 +114,69 @@ def createTreeFromList_rec(lst, i, power):
 
 
 class TestMavnatProject1(unittest.TestCase):
+
+
+    def testCreateTreeFromList(self):
+        tree1 = createTreeFromList([])
+        self.assertEqual(tree1.length(), 0)
+        self.assertEqual(tree1.firstitem, None)
+        self.assertEqual(tree1.lastitem, None)
+        self.assertEqual(tree1.getRoot().getLeft(), None)
+        self.assertEqual(tree1.getRoot().getRight(), None)
+        self.assertEqual(tree1.getRoot().getParent(), None)
+        self.assertEqual(tree1.getRoot().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getHeight(), -1)
+
+        tree1= createTreeFromList(["a"])
+        self.assertEqual(tree1.length(), 1)
+        self.assertEqual(tree1.firstitem.getValue(), "a")
+        self.assertEqual(tree1.lastitem.getValue(), "a")
+        self.assertEqual(tree1.getRoot().getLeft().getHeight(), -1)
+        self.assertEqual(tree1.getRoot().getLeft().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getLeft().getParent(), tree1.getRoot())
+        self.assertEqual(tree1.getRoot().getRight().getHeight(), -1)
+        self.assertEqual(tree1.getRoot().getRight().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getRight().getParent(), tree1.getRoot())
+        self.assertEqual(tree1.getRoot().getSize(), 1)
+        self.assertEqual(tree1.getRoot().getHeight(), 0)
+
+
+        tree1= createTreeFromList(["a","b","c",None,"d","e","f"])
+        self.assertEqual(tree1.length(), 7)
+        self.assertEqual(tree1.firstitem.getValue(), "d")
+        self.assertEqual(tree1.lastitem.getValue(),"f")
+        self.assertEqual(tree1.getRoot().getSize(),7)
+        self.assertEqual(tree1.getRoot().getHeight(),2)
+        self.assertEqual(tree1.getRoot().getParent, None)
+        self.assertEqual(tree1.firstitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.firstitem.getRight().getHeight(), -1)
+        self.assertEqual(tree1.lastitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.lastitem.getRight().getHeight(), -1)
+
+        tree1 = createTreeFromList(["a", None, "b"])
+        self.assertEqual(tree1.length(), 2)
+        self.assertEqual(tree1.firstitem.getValue(), "a")
+        self.assertEqual(tree1.lastitem.getValue(),"b")
+        self.assertEqual(tree1.getRoot().getSize(),2)
+        self.assertEqual(tree1.getRoot().getHeight(),1)
+        self.assertEqual(tree1.getRoot().getParent(), None)
+        self.assertEqual(tree1.firstitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.firstitem.getRight().getHeight(), 0)
+        self.assertEqual(tree1.lastitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.lastitem.getRight().getHeight(), -1)
+
+
+        tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f"])
+        self.assertEqual(tree1, False)
+
+        tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
+        self.assertEqual(tree1, False)
+
+
+
+
+
+
     
     def testInsert_Rotations(self):
         tree1=AVLTreeList.AVLTreeList()
