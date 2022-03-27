@@ -205,7 +205,7 @@ class AVLNode(object):
 
 	# def testGet
 
-
+	
 """
 A class implementing the ADT list, using an AVL tree.
 """
@@ -232,8 +232,6 @@ class AVLTreeList(object):
 		if self.length()==0:
 			return True
 		return False
-	
-	
 
 	"""retrieves the value of the i'th item in the list
 
@@ -599,7 +597,19 @@ class AVLTreeList(object):
 	@returns: the first index that contains val, -1 if not found.
 	"""
 	def search(self, val):
-		return None
+		return self.search_rec(self.getRoot(), val, 0)
+
+	def search_rec(self, node, val, cnt):
+		if (not node.isRealNode()):
+			return -1
+		left=self.search_rec(node.getLeft(),val, cnt)
+		if left>=0:
+			return left
+		if node.getValue()==val:
+			return cnt + node.getLeft().getSize()
+		else:
+			return self.search_rec(node.getRight(),val, cnt+ node.getLeft().getSize()+1)
+
 
 	"""right rotation to balance the list
 

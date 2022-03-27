@@ -3,16 +3,22 @@ import avl_skeleton as AVLTreeList
 import math
 
 
-"""This method is for testing ONLY and returns a legal tree created from a given list
-@pre: list of strings which satisfies the following format:
-	list length is a power of 2 and
-	index 0 is the root,
-	next 2 indexes are the sons of the root,
-	next 4 indexes are the sons of the root's sons
-	and so on by this pattern while a "missing son" will be represented by None
-@post: False if list represents illegal tree, compatible AVLTreeList otherwise
-@rtype: AVLTreeList
+"""returns index of given node in the list
+!!! This method is for testing and does not run on O(1), don't use for class methods
 """
+def indexOf(node):
+    parent = node
+    if parent.getParent().getLeft() is parent:
+        while parent.getParent().getLeft() is parent:
+            parent=parent.getParent()
+        return node.getLeft().getSize()+parent.getLeft()+1
+    else:
+        while parent.getParent().getroght is parent:
+            parent = parent.getParent()
+        return node.getParent().getLeft().getSize()+1+parent.getLeft().getSize()+1 + node.getLeft.getSize()
+
+
+
 
 def setFirst(tree):
     first=tree.getRoot()
@@ -26,6 +32,34 @@ def setLast(tree):
         last = last.getRight()
     tree.lastitem = last
 
+"""This method is for testing ONLY and returns a legal tree basded in a given list
+@pre: list of strings which satisfies the following format: (examples ahead)
+	list length is a power of 2 and
+	index 0 is the root
+    next 2 indexes are the sons of the root,
+	next 4 indexes are the sons of the root's sons, from left to right
+    next 8 ...
+	and so on by this pattern while a "missing son" will be represented by None
+@post: False if list represents illegal tree, compatible AVLTreeList otherwise
+@rtype: AVLTreeList
+
+examples:
+The list ['a','b','c','d','e',None,'f'] will create the following tree
+(including virtual sons which are not detailed here)
+             a
+          /     \
+        b         c
+      /   \         \
+     d     e         f
+
+The list ['a','None','c',None, None, None, 'f'] will return False 
+because it represents an illegal tree:
+             a
+                \
+                  c
+                    \
+                     f
+"""
 
 def createTreeFromList(lst):
     tree = AVLTreeList.AVLTreeList()
@@ -228,11 +262,31 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual('i', avl2.retrieve(8))
         
 
-    def testConcat(self):
-        tree1 = createTreeFromList(['z','x','w','y',None,None,None])
-        tree2 = createTreeFromList(['a','b','c'])
-        result = tree1.concat(tree2)
-        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+    # def testConcat(self):
+    #     tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+    #     tree2 = createTreeFromList(['a','b','c'])
+    #     result = tree1.concat(tree2)
+    #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+
+
+    def testSearch(self):
+        tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
+        self.assertEqual(tree1.search('p'),0)
+        self.assertEqual(tree1.search('y'),1)
+        self.assertEqual(tree1.search('q'),2)
+        self.assertEqual(tree1.search('w'),3)
+        self.assertEqual(tree1.search('x'),4)
+        self.assertEqual(tree1.search('u'),5)
+        self.assertEqual(tree1.search('z'),6)
+        self.assertEqual(tree1.search('v'),7)
+        self.assertEqual(tree1.search('a'),-1)
+
+        tree2 = createTreeFromList(['p','w','z','p','w','z','v',None, None,'q',None, None, None, None, None])
+        self.assertEqual(tree2.search('z'),5)
+        self.assertEqual(tree2.search('p'),0)
+        self.assertEqual(tree2.search('w'),1)
+
+
 
 
 if __name__ == '__main__':
