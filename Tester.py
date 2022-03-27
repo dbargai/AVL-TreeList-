@@ -268,22 +268,22 @@ class TestMavnatProject1(unittest.TestCase):
     #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
 
 
-    # def testSearch(self):
-    #     tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
-    #     self.assertEqual(tree1.search('p'),0)
-    #     self.assertEqual(tree1.search('y'),1)
-    #     self.assertEqual(tree1.search('q'),2)
-    #     self.assertEqual(tree1.search('w'),3)
-    #     self.assertEqual(tree1.search('x'),4)
-    #     self.assertEqual(tree1.search('u'),5)
-    #     self.assertEqual(tree1.search('z'),6)
-    #     self.assertEqual(tree1.search('v'),7)
-    #     self.assertEqual(tree1.search('a'),-1)
+    def testSearch(self):
+        tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
+        self.assertEqual(tree1.search('p'),0)
+        self.assertEqual(tree1.search('y'),1)
+        self.assertEqual(tree1.search('q'),2)
+        self.assertEqual(tree1.search('w'),3)
+        self.assertEqual(tree1.search('x'),4)
+        self.assertEqual(tree1.search('u'),5)
+        self.assertEqual(tree1.search('z'),6)
+        self.assertEqual(tree1.search('v'),7)
+        self.assertEqual(tree1.search('a'),-1)
 
-    #     tree2 = createTreeFromList(['p','w','z','p','w','z','v',None, None,'q',None, None, None, None, None])
-    #     self.assertEqual(tree2.search('z'),5)
-    #     self.assertEqual(tree2.search('p'),0)
-    #     self.assertEqual(tree2.search('w'),1)
+        tree2 = createTreeFromList(['p','w','z','p','w','z','v',None, None,'q',None, None, None, None, None])
+        self.assertEqual(tree2.search('z'),5)
+        self.assertEqual(tree2.search('p'),0)
+        self.assertEqual(tree2.search('w'),1)
 
 
 
