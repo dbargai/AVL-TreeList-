@@ -36,7 +36,7 @@ def setLast(tree):
 
 """This method is for testing ONLY and returns a legal tree basded in a given list
 @pre: list of strings which satisfies the following format: (examples ahead)
-	list length is a power of 2 and
+	list length is a power of 2 minus 1 and
 	index 0 is the root
     next 2 indexes are the sons of the root,
 	next 4 indexes are the sons of the root's sons, from left to right
@@ -66,6 +66,8 @@ because it represents an illegal tree:
 def createTreeFromList(lst):
     if len(lst)==0:
         return AVLTreeList.AVLTreeList()
+    if math.log(len(lst) +1, 2)%1!=0:
+        return False
     tree = AVLTreeList.AVLTreeList()
     root = createTreeFromList_rec(lst,0,0)
     if root.height>-2:
@@ -79,38 +81,39 @@ def createTreeFromList(lst):
         return False
 
 def createTreeFromList_rec(lst, i, power):
-	if(lst[i]==None):
+    if(lst[i]==None):
 		#return virtual Node from lst[i]:
-		return AVLTreeList.AVLNode(lst[i])	 
+        return AVLTreeList.AVLNode(lst[i])
 
 	##calc next index of left son's index, right son will be the following index:
-	nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+    nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+    
+    if nextIndex>=len(lst):
+        node = AVLTreeList.AVLNode(None)
+        node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
+        node.getLeft().setParent(node)
+        node.getRight().setParent(node)
+        return node
 
-	if nextIndex>=len(lst):
-		##Create leaf node:
-		node = AVLTreeList.AVLNode(None)
-		node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
-		return node
+    left = createTreeFromList_rec(lst, nextIndex, power+1)
+    right = createTreeFromList_rec(lst, nextIndex +1, power+1)
+    if left.getHeight()>-2 and right.getHeight()>-2:
+        if abs(right.height-left.height)>1:
+            node = AVLTreeList.AVLNode(None)
+            node.setHeight(-2)
+            return node
 
-	left = createTreeFromList_rec(lst, nextIndex, power+1)
-	right = createTreeFromList_rec(lst, nextIndex +1, power+1)
-	if left.getHeight()>-2 and right.getHeight()>-2:
-		if abs(right.height-left.height)>1:
-			node = AVLTreeList.AVLNode(None)
-			node.setHeight(-2)
-			return node
+        else:
+            node = AVLTreeList.AVLNode(lst[i])
+            node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
+            left.setParent(node)
+            right.setParent(node)
+            return node
 
-		else:
-			node = AVLTreeList.AVLNode(lst[i])
-			node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
-			left.setParent(node)
-			right.setParent(node)
-			return node
-
-	else:
-		node = AVLTreeList.AVLNode(None)
-		node.setHeight(-2)
-		return node
+    else:
+        node = AVLTreeList.AVLNode(None)
+        node.setHeight(-2)
+        return node
 
 
 class TestMavnatProject1(unittest.TestCase):
@@ -142,14 +145,14 @@ class TestMavnatProject1(unittest.TestCase):
 
 
         tree1= createTreeFromList(["a","b","c",None,"d","e","f"])
-        self.assertEqual(tree1.length(), 7)
-        self.assertEqual(tree1.firstitem.getValue(), "d")
+        self.assertEqual(tree1.length(), 6)
+        self.assertEqual(tree1.firstitem.getValue(), "b")
         self.assertEqual(tree1.lastitem.getValue(),"f")
-        self.assertEqual(tree1.getRoot().getSize(),7)
+        self.assertEqual(tree1.getRoot().getSize(),6)
         self.assertEqual(tree1.getRoot().getHeight(),2)
-        self.assertEqual(tree1.getRoot().getParent, None)
+        self.assertEqual(tree1.getRoot().getParent(), None)
         self.assertEqual(tree1.firstitem.getLeft().getHeight(), -1)
-        self.assertEqual(tree1.firstitem.getRight().getHeight(), -1)
+        self.assertEqual(tree1.firstitem.getRight().getHeight(), 0)
         self.assertEqual(tree1.lastitem.getLeft().getHeight(), -1)
         self.assertEqual(tree1.lastitem.getRight().getHeight(), -1)
 
