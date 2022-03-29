@@ -400,14 +400,6 @@ class TestMavnatProject1(unittest.TestCase):
         L.reverse()
         self.assertEqual(True, tree1.listToArray()==L)
 
-<<<<<<< HEAD
-            
-    # def testConcat(self):
-    #     tree1 = createTreeFromList(['z','x','w','y',None,None,None])
-    #     tree2 = createTreeFromList(['a','b','c'])
-    #     result = tree1.concat(tree2)
-    #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
-=======
     def testConcat(self):
         tree1 = createTreeFromList(['z','x','w','y',None,None,None])
         tree2 = createTreeFromList(['a','b','c'])
@@ -421,7 +413,6 @@ class TestMavnatProject1(unittest.TestCase):
         expceted = createTreeFromList(['w','x','a','y','z','b','c'])
         self.assertEqual(expceted.listToArray(), tree1.listToArray())
 
->>>>>>> main
 
 
     # def testSearch(self):
