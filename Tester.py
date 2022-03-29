@@ -6,6 +6,8 @@ import math
 """returns index of given node in the list
 !!! This method is for testing and does not run on O(1), don't use for class methods
 """
+
+
 def indexOf(node):
     parent = node
     if parent.getParent().getLeft() is parent:
@@ -42,7 +44,7 @@ def setLast(tree):
 
 """This method is for testing ONLY and returns a legal tree basded in a given list
 @pre: list of strings which satisfies the following format: (examples ahead)
-	list length is a power of 2 and
+	list length is a power of 2 minus 1 and
 	index 0 is the root
     next 2 indexes are the sons of the root,
 	next 4 indexes are the sons of the root's sons, from left to right
@@ -70,6 +72,10 @@ because it represents an illegal tree:
 """
 
 def createTreeFromList(lst):
+    if len(lst)==0:
+        return AVLTreeList.AVLTreeList()
+    if math.log(len(lst) +1, 2)%1!=0:
+        return False
     tree = AVLTreeList.AVLTreeList()
     root = createTreeFromList_rec(lst,0,0)
     if root.height>-2:
@@ -83,41 +89,105 @@ def createTreeFromList(lst):
         return False
 
 def createTreeFromList_rec(lst, i, power):
-	if(lst[i]==None):
+    if(lst[i]==None):
 		#return virtual Node from lst[i]:
-		return AVLTreeList.AVLNode(lst[i])	 
+        return AVLTreeList.AVLNode(lst[i])
 
 	##calc next index of left son's index, right son will be the following index:
-	nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+    nextIndex=i+2**power+(i+1)-2**(math.floor(math.log(i+1,2)))
+    
+    if nextIndex>=len(lst):
+        node = AVLTreeList.AVLNode(None)
+        node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
+        node.getLeft().setParent(node)
+        node.getRight().setParent(node)
+        return node
 
-	if nextIndex>=len(lst):
-		##Create leaf node:
-		node = AVLTreeList.AVLNode(None)
-		node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
-		return node
+    left = createTreeFromList_rec(lst, nextIndex, power+1)
+    right = createTreeFromList_rec(lst, nextIndex +1, power+1)
+    if left.getHeight()>-2 and right.getHeight()>-2:
+        if abs(right.height-left.height)>1:
+            node = AVLTreeList.AVLNode(None)
+            node.setHeight(-2)
+            return node
 
-	left = createTreeFromList_rec(lst, nextIndex, power+1)
-	right = createTreeFromList_rec(lst, nextIndex +1, power+1)
-	if left.getHeight()>-2 and right.getHeight()>-2:
-		if abs(right.height-left.height)>1:
-			node = AVLTreeList.AVLNode(None)
-			node.setHeight(-2)
-			return node
+        else:
+            node = AVLTreeList.AVLNode(lst[i])
+            node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
+            left.setParent(node)
+            right.setParent(node)
+            return node
 
-		else:
-			node = AVLTreeList.AVLNode(lst[i])
-			node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
-			left.setParent(node)
-			right.setParent(node)
-			return node
-
-	else:
-		node = AVLTreeList.AVLNode(None)
-		node.setHeight(-2)
-		return node
+    else:
+        node = AVLTreeList.AVLNode(None)
+        node.setHeight(-2)
+        return node
 
 
 class TestMavnatProject1(unittest.TestCase):
+
+
+    def testCreateTreeFromList(self):
+        tree1 = createTreeFromList([])
+        self.assertEqual(tree1.length(), 0)
+        self.assertEqual(tree1.firstitem, None)
+        self.assertEqual(tree1.lastitem, None)
+        self.assertEqual(tree1.getRoot().getLeft(), None)
+        self.assertEqual(tree1.getRoot().getRight(), None)
+        self.assertEqual(tree1.getRoot().getParent(), None)
+        self.assertEqual(tree1.getRoot().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getHeight(), -1)
+
+        tree1= createTreeFromList(["a"])
+        self.assertEqual(tree1.length(), 1)
+        self.assertEqual(tree1.firstitem.getValue(), "a")
+        self.assertEqual(tree1.lastitem.getValue(), "a")
+        self.assertEqual(tree1.getRoot().getLeft().getHeight(), -1)
+        self.assertEqual(tree1.getRoot().getLeft().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getLeft().getParent(), tree1.getRoot())
+        self.assertEqual(tree1.getRoot().getRight().getHeight(), -1)
+        self.assertEqual(tree1.getRoot().getRight().getSize(), 0)
+        self.assertEqual(tree1.getRoot().getRight().getParent(), tree1.getRoot())
+        self.assertEqual(tree1.getRoot().getSize(), 1)
+        self.assertEqual(tree1.getRoot().getHeight(), 0)
+
+
+        tree1= createTreeFromList(["a","b","c",None,"d","e","f"])
+        self.assertEqual(tree1.length(), 6)
+        self.assertEqual(tree1.firstitem.getValue(), "b")
+        self.assertEqual(tree1.lastitem.getValue(),"f")
+        self.assertEqual(tree1.getRoot().getSize(),6)
+        self.assertEqual(tree1.getRoot().getHeight(),2)
+        self.assertEqual(tree1.getRoot().getParent(), None)
+        self.assertEqual(tree1.firstitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.firstitem.getRight().getHeight(), 0)
+        self.assertEqual(tree1.lastitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.lastitem.getRight().getHeight(), -1)
+
+        tree1 = createTreeFromList(["a", None, "b"])
+        self.assertEqual(tree1.length(), 2)
+        self.assertEqual(tree1.firstitem.getValue(), "a")
+        self.assertEqual(tree1.lastitem.getValue(),"b")
+        self.assertEqual(tree1.getRoot().getSize(),2)
+        self.assertEqual(tree1.getRoot().getHeight(),1)
+        self.assertEqual(tree1.getRoot().getParent(), None)
+        self.assertEqual(tree1.firstitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.firstitem.getRight().getHeight(), 0)
+        self.assertEqual(tree1.lastitem.getLeft().getHeight(), -1)
+        self.assertEqual(tree1.lastitem.getRight().getHeight(), -1)
+
+
+        tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f"])
+        self.assertEqual(tree1, False)
+
+        tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
+        self.assertEqual(tree1, False)
+
+
+
+
+
+
     
     def testInsert_Rotations(self):
         tree1=AVLTreeList.AVLTreeList()
@@ -297,23 +367,6 @@ class TestMavnatProject1(unittest.TestCase):
         
         
 
-       
-
-#     def testRetrieve(self):
-        
-# 	### First Tree: [a,b,c,d,e,f,g,h,i]:
-# 	### Create List of AVLNodes:
-#         nodes = [
-# 			AVLTreeList.AVLNode("f"),
-# 			AVLTreeList.AVLNode("b"),
-# 			AVLTreeList.AVLNode("h"), 
-# 			AVLTreeList.AVLNode("a"),
-# 			AVLTreeList.AVLNode("d"),
-# 			AVLTreeList.AVLNode("g"),
-# 			AVLTreeList.AVLNode("i"),
-# 			AVLTreeList.AVLNode("c"), 
-# 			AVLTreeList.AVLNode("e")]
-
     def testRetrieve(self):
 	### First Tree:        
         avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
@@ -347,12 +400,28 @@ class TestMavnatProject1(unittest.TestCase):
         L.reverse()
         self.assertEqual(True, tree1.listToArray()==L)
 
+<<<<<<< HEAD
             
     # def testConcat(self):
     #     tree1 = createTreeFromList(['z','x','w','y',None,None,None])
     #     tree2 = createTreeFromList(['a','b','c'])
     #     result = tree1.concat(tree2)
     #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+=======
+    def testConcat(self):
+        tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
+        tree1 =createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
+>>>>>>> main
 
 
     # def testSearch(self):
