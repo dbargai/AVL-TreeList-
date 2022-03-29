@@ -368,16 +368,14 @@ class AVLTreeList(object):
 	def insert(self,i,val):
 		if self.empty(): 
 			self.createRoot(val)
-			self.firstitem=val
-			self.lastitem=val
+			self.firstitem=self.root
+			self.lastitem=self.root
 			return 0
-		if i==0:
-			self.firstitem=val
 		if i==self.length(): #maintain first and last pointers
-			self.lastitem=val
 			max=self.retrieve_node(i-1)
 			node=max.getRight()
 			self.createNode(node,val)
+			self.lastitem=node
 		else:
 			curr=self.retrieve_node(i)
 			if not curr.getLeft().isRealNode():
@@ -387,6 +385,8 @@ class AVLTreeList(object):
 				parent=self.predecessor(curr)
 				node=parent.getRight()
 				self.createNode(node,val)
+			if i==0:
+				self.firstitem=node
 		return self.rebalance(node)
 
 
@@ -435,21 +435,25 @@ class AVLTreeList(object):
 	"""
 	def delete(self, i):
 		cnt_rotations=0
+		first=False
+		last=False
 		if self.length()!=1:
-			if i==self.length()-1:
-				self.lastitem=self.retrieve(i-1)
-			if i==0:
-				self.firstitem=self.retrieve(1)
+			last=True if i==self.length()-1 else False
+			last=True if i==0 else False
 		else: #delete the only item and its the root
 			self.lastitem=None
 			self.firstitem=None
 		node= self.retrieve_node(i)
+		if last:
+			self.lastitem=self.predecessor(node)
+		if first:
+			self.firstitem=self.successor(node)
 		if node.isLeaf():
 			self.deleteNode(node)
 			if self.getRoot()!=node:
 				parent=node.getParent()
 			else:
-				parent=node
+				return 0
 		elif node.isMediumNode(): #node has one real child
 			if self.getRoot()==node:
 				self.root=node.realChild()
@@ -458,16 +462,11 @@ class AVLTreeList(object):
 				self.deleteMiddleNode(node)
 			parent=node.getParent()
 		else: #node has two real children
-			successor=self.retrieve_node(i+1) #physical deleted node
+			successor=self.successor(node) #physical deleted node
 			parent=successor.getParent() 
 			node.setValue(successor.getValue())
 			self.deleteNode(successor) if successor.isLeaf() else self.deleteMiddleNode(successor)
-		if parent==None: 
-			return 0
-		if parent.getValue()!=None:
-			parent.setSize(parent.left.getSize()+parent.right.getSize()+1)
-			parent.setHeight(1+max(parent.left.getHeight(),parent.right.getHeight()))
-			cnt_rotations=self.rebalance(parent)
+		cnt_rotations=self.rebalance(parent)
 		return cnt_rotations
 
 
@@ -478,7 +477,7 @@ class AVLTreeList(object):
 	@returns: the value of the first item, None if the list is empty
 	"""
 	def first(self):
-		return self.firstitem
+		return self.firstitem.getValue()
 
 	"""returns the value of the last item in the list
 
@@ -486,7 +485,7 @@ class AVLTreeList(object):
 	@returns: the value of the last item, None if the list is empty
 	"""
 	def last(self):
-		return self.lastitem
+		return self.lastitem.getValue()
 
 	"""returns an array representing list 
 
@@ -825,11 +824,33 @@ class AVLTreeList(object):
 	@returns: the predecessor
 	"""
 	def predecessor(self,node):
-		start=node.getLeft()
-		while (start.getRight().isRealNode()):
-			start=start.getRight()
-		return start			
-
+		if node.getLeft().isRealNode():
+			start=node.getLeft()
+			while (start.getRight().isRealNode()):
+				start=start.getRight()
+			return start			
+		parent=node.getParent()
+		while parent!=None and parent.getLeft()==node:
+			node=parent
+			parent=node.getParent()
+		return parent
+	"""finds predecessor of a given node
+	@pre: self.isRealNode(node.getR()) 
+	@type: AVLNode
+	@rtype: AVLNode
+	@returns: the predecessor
+	"""
+	def successor(self,node):
+		if node.getRight().isRealNode():
+			start=node.getRight()
+			while (start.getLeft().isRealNode()):
+				start=start.getLeft()
+			return start			
+		parent=node.getParent()
+		while parent!=None and parent.getRight()==node:
+			node=parent
+			parent=node.getParent()
+		return parent
 def main():
 	pass
 	mytree= AVLTreeList()
