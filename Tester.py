@@ -300,23 +300,6 @@ class TestMavnatProject1(unittest.TestCase):
         tree1.insert(2**10-1,2**10-1)
         self.assertEqual(True,tree1.getRoot().getHeight()==10)
 
-       
-
-#     def testRetrieve(self):
-        
-# 	### First Tree: [a,b,c,d,e,f,g,h,i]:
-# 	### Create List of AVLNodes:
-#         nodes = [
-# 			AVLTreeList.AVLNode("f"),
-# 			AVLTreeList.AVLNode("b"),
-# 			AVLTreeList.AVLNode("h"), 
-# 			AVLTreeList.AVLNode("a"),
-# 			AVLTreeList.AVLNode("d"),
-# 			AVLTreeList.AVLNode("g"),
-# 			AVLTreeList.AVLNode("i"),
-# 			AVLTreeList.AVLNode("c"), 
-# 			AVLTreeList.AVLNode("e")]
-
     def testRetrieve(self):
 	### First Tree:        
         avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
@@ -331,11 +314,19 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual('i', avl2.retrieve(8))
         
 
-    # def testConcat(self):
-    #     tree1 = createTreeFromList(['z','x','w','y',None,None,None])
-    #     tree2 = createTreeFromList(['a','b','c'])
-    #     result = tree1.concat(tree2)
-    #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+    def testConcat(self):
+        tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
+        tree1 =createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
 
 
     def testSearch(self):

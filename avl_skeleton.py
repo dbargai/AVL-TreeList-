@@ -535,13 +535,17 @@ class AVLTreeList(object):
 	"""
 	def concat(self, lst):
 		node = None
-		middle = self.last
-		self.delete(self.length-1)
-		if self.length > lst.length:
-			node=self.findMaximalNodeByHeight(lst.height)
-		else:
-			node=self.findMinimalNodeByHeight(self.height)
+		middle = AVLNode(self.lastitem.getValue())
+		self.delete(self.length()-1)
+		if self.length() > lst.length():
+			node=self.findMaximalNodeByHeight(lst.getRoot().getHeight())
+			self.concat_redirect(middle, self.getRoot(), node)
+		elif self.length() < lst.length():
+			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
 			self.concat_redirect(middle, lst.getRoot(),node)
+		else:
+			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
+			self.concat_redirect(middle, middle,node)
 		
 		
 		return None
@@ -607,13 +611,14 @@ class AVLTreeList(object):
 		return node
 	
 	def concat_redirect(self, mid, newRoot, minNode):
-		mid.setLeft(self.getRoot)
+		mid.setLeft(self.getRoot())
 		mid.setRight(minNode)
-		self.getRoot().setParent(minNode.getParent())
 		mid.setParent(minNode.getParent())
+		mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
+		mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
+		self.getRoot().setParent(mid)
 		minNode.setParent(mid)
 		self.root = newRoot
-
 
 	"""searches for a *value* in the list
 
@@ -623,7 +628,19 @@ class AVLTreeList(object):
 	@returns: the first index that contains val, -1 if not found.
 	"""
 	def search(self, val):
-		return None
+		return self.search_rec(self.getRoot(), val, 0)
+
+	def search_rec(self, node, val, cnt):
+		if (not node.isRealNode()):
+			return -1
+		left=self.search_rec(node.getLeft(),val, cnt)
+		if left>=0:
+			return left
+		if node.getValue()==val:
+			return cnt + node.getLeft().getSize()
+		else:
+			return self.search_rec(node.getRight(),val, cnt+ node.getLeft().getSize()+1)
+
 
 	"""right rotation to balance the list
 
