@@ -538,14 +538,14 @@ class AVLTreeList(object):
 		self.delete(self.length()-1)
 		if self.length() > lst.length():
 			node=self.findMaximalNodeByHeight(lst.getRoot().getHeight())
-			self.concat_redirect(middle, self.getRoot(), node)
+			self.concat_redirect(middle, node, lst.getRoot(), node.getParent(), self.getRoot() ,'R')
 		elif self.length() < lst.length():
 			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(middle, lst.getRoot(),node)
+			self.concat_redirect(middle, self.getRoot(), node, node.getParent(), lst.getRoot(), self.getRoot(), 'L')
 		else:
 			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(middle, middle,node)
-		
+			self.concat_redirect(middle, self.getRoot(), node, None, middle, None)
+		self.rebalance(middle.getParent())
 		
 		return None
 
@@ -609,14 +609,24 @@ class AVLTreeList(object):
 			node=node.right
 		return node
 	
-	def concat_redirect(self, mid, newRoot, minNode):
-		mid.setLeft(self.getRoot())
-		mid.setRight(minNode)
-		mid.setParent(minNode.getParent())
+	"""set sons and parents fields for concat (O(1))
+	@rtype: None
+	@pre: $side in {'R', 'L'}
+	@type s: string
+	"""
+	def concat_redirect(self, mid, left, right, parent , newRoot, side):
+		mid.setLeft(left)
+		mid.getLeft().setParent(mid)
+		mid.setRight(right)
+		mid.getRight().setParent(mid)
+		mid.setParent(parent)
 		mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
 		mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
-		self.getRoot().setParent(mid)
-		minNode.setParent(mid)
+		if parent!=None:
+			if (side=='R'):
+				parent.setRight(mid)
+			else:
+				parent.setLeft(mid)
 		self.root = newRoot
 
 	"""searches for a *value* in the list
