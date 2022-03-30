@@ -229,7 +229,7 @@ class AVLTreeList(object):
 		return False	
 
 	"""retrieves the value of the i'th item in the list
-
+	time compexity: O(logn) - searching from root downway only
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
@@ -243,7 +243,7 @@ class AVLTreeList(object):
 			return self.retrieve_node(i).value
 
 	"""retrieves the i'th node in the list
-
+	Time Complexity: O(logn)
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
@@ -282,7 +282,6 @@ class AVLTreeList(object):
 		node.setHeight(0)
 		node.size+=1
 		return None
-
 	
 	"""creates a root when the tree is empty
 
@@ -830,8 +829,10 @@ class AVLTreeList(object):
 			node=parent
 			parent=node.getParent()
 		return parent
-	"""finds predecessor of a given node
-	@pre: self.isRealNode(node.getR()) 
+	
+	"""finds successor of a given node
+	Time Complexity (worst case): O(logn) - going downward only or upward only
+	@pre: self.isRealNode(node.getR())
 	@type: AVLNode
 	@rtype: AVLNode
 	@returns: the predecessor
