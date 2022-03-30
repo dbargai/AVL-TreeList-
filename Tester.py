@@ -302,6 +302,7 @@ class TestMavnatProject1(unittest.TestCase):
                        
 
     def randomTrees(self):
+        x=None
         tree=AVLTreeList.AVLTreeList()
         L=[]
         for j in range(10):

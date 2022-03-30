@@ -392,39 +392,7 @@ class AVLTreeList(object):
 
 
 
-	def insertRec(self, i, val,node,rebalance): #recursion 
-		if not node.isRealNode():
-			self.createNode(node,val)
-		
-		elif i<=node.left.size:
-			node.size+=1
-			rebalance+=self.insertRec(i, val ,node.left,rebalance)
-		else: 
-
-			node.size+=1
-			rebalance+=self.insertRec(i-1-(node.left.size), val ,node.right,rebalance)
-		
-		node.setHeight(1+max(node.left.height,node.right.height)) #set new height if needed
-		BF=node.getBF()
-		if abs(BF)>=2:
-			
-			if (BF)>1: #BF=+2
-				if node.left.getBF()==1: #BF of left son is +1
-					self.rotateRight(node,node.left)
-					return 1
-				else: #BF of the left son is -1
-					self.rotateLeftThenRight(node,node.left,node.left.right) #left then right
-					return 2
-			else: #BF=-2
-				if node.right.getBF()==-1: #BF of right son is -1
-					self.rotateLeft(node,node.right)
-					return 1
-				else: #BF of the right son is +1
-					self.rotateRightThenLeft(node,node.right,node.right.left) #right then left
-					return 2
-		
-		return rebalance
-
+	
 	"""deletes the i'th item in the list
 
 	@type i: int
