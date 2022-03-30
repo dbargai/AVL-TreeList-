@@ -21,8 +21,7 @@ class AVLNode(object):
 
 	@type value: str
 	@param value: data of your node
-	@inv index in list = $left.size+1
-	@$height=-1 implies this is a virtual node
+	@$height=-1 @implies this is a virtual node
 	"""
 	def __init__(self, value):
 		self.value = value
@@ -32,6 +31,13 @@ class AVLNode(object):
 		self.height = -1
 		self.size = 0
 		
+	
+	"""Set all node fields by given
+	@type value: str
+	@type left, right, parent: AVLNode
+	@type height, size: int
+	@param value: data of your node
+	"""
 	def setFields(self, value, left, right, parent, height, size):
 		self.value = value
 		self.left = left
@@ -48,7 +54,6 @@ class AVLNode(object):
 	"""
 	def getLeft(self):
 		return self.left
-
 
 	"""returns the right child
 
@@ -91,7 +96,6 @@ class AVLNode(object):
 	def getSize(self):
 		return self.size
 	
-	
 	""" returns the Balance Factor
 		@rtype: int
 		@returns: the Balance Factor of self
@@ -99,8 +103,6 @@ class AVLNode(object):
 	"""	
 	def getBF(self):
 		return self.getLeft().getHeight() - self.getRight().getHeight()
-
-
 
 	"""sets left child
 
@@ -146,6 +148,7 @@ class AVLNode(object):
 	def setHeight(self, h):
 		self.height=h
 		return None
+	
 	"""sets the size of the node
 
 	@type size: int
@@ -154,11 +157,12 @@ class AVLNode(object):
 	def setSize(self, size):
 		self.size=size
 		return None
+
 	"""returns whether self is not a virtual node 
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
-	"""
+	"""	
 	def isRealNode(self):
 		return self.left!=None or self.right!=None
 
@@ -171,12 +175,10 @@ class AVLNode(object):
 		if self.left.isRealNode() or self.right.isRealNode():
 			return False
 		return True
-
 	
-	"""returns whether self is has one real child
-
+	"""returns whether self is has exactly one real son
 	@rtype: bool
-	@returns: True if self has one real child, False otherwise.
+	@returns: True if self has exactly one real child, False otherwise.
 	"""
 	def isMediumNode(self):
 		cnt=0
@@ -198,12 +200,6 @@ class AVLNode(object):
 			return self.left
 		else:
 			return self.right
-	# def orTester():
-	# 	lst tests = [AVLNode("3"), AVLNode(""), AVLNode("733")]
-	# 	tests[0].height = 10
-	# 	pass
-
-	# def testGet
 
 
 """
@@ -222,7 +218,6 @@ class AVLTreeList(object):
 		self.lastitem= None
 		# add your fields here
 
-
 	"""returns whether the list is empty
 
 	@rtype: bool
@@ -231,9 +226,7 @@ class AVLTreeList(object):
 	def empty(self):
 		if self.length()==0:
 			return True
-		return False
-	
-	
+		return False	
 
 	"""retrieves the value of the i'th item in the list
 
@@ -244,7 +237,10 @@ class AVLTreeList(object):
 	@returns: the value of the i'th item in the list
 	"""
 	def retrieve(self, i):
-		return self.retrieve_node(i).value
+		if (i<0 or i>self.length()-1):
+			return None
+		else:
+			return self.retrieve_node(i).value
 
 	"""retrieves the i'th node in the list
 

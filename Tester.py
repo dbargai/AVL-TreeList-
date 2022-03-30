@@ -379,6 +379,7 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual('g', avl2.retrieve(6))
         self.assertEqual('h', avl2.retrieve(7))
         self.assertEqual('i', avl2.retrieve(8))
+        self.assertEqual(None, avl2.retrieve(9))
         
     def testSuccessorPre(self):
         tree1= AVLTreeList.AVLTreeList()
@@ -412,8 +413,6 @@ class TestMavnatProject1(unittest.TestCase):
         tree1.concat(tree2)
         expceted = createTreeFromList(['w','x','a','y','z','b','c'])
         self.assertEqual(expceted.listToArray(), tree1.listToArray())
-
-
 
     # def testSearch(self):
     #     tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
