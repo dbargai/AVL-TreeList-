@@ -182,12 +182,6 @@ class TestMavnatProject1(unittest.TestCase):
 
         tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
         self.assertEqual(tree1, False)
-
-
-
-
-
-
     
     def testInsert_Rotations(self):
         tree1=AVLTreeList.AVLTreeList()
@@ -250,10 +244,6 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,  tree1.getRoot().getHeight()==3)  
         self.assertEqual(True,  tree1.getRoot().right.getHeight()==2)  
 
-   
-       
-
-
     def testDelete(self):
         tree1= AVLTreeList.AVLTreeList()
         for i in range(6,-1,-1):
@@ -299,10 +289,6 @@ class TestMavnatProject1(unittest.TestCase):
             self.assertEqual(True,tree1.getRoot().getValue()==None)                
             self.assertEqual(True,tree1.empty()==True) 
                        
-
-        
-
-
     def testMediumTreesOperations(self):
         tree1= AVLTreeList.AVLTreeList()
         cnt=0
@@ -360,13 +346,6 @@ class TestMavnatProject1(unittest.TestCase):
             self.assertEqual(True, isAVL(tree1.getRoot()))
         self.assertEqual(True,tree1.empty())
 
-
-        
-
-    
-        
-        
-
     def testRetrieve(self):
 	### First Tree:        
         avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
@@ -413,6 +392,13 @@ class TestMavnatProject1(unittest.TestCase):
         tree1.concat(tree2)
         expceted = createTreeFromList(['w','x','a','y','z','b','c'])
         self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
+    def testSplit(self):
+        tree = createTreeFromList(['a','b','c',None,'d','e','f',None,None,None,None,None,'g',None,None])
+        result = tree.split(4)
+        left_lst=result[0]
+        right_lst=result[2]
+        #expceted_right = createTreeFromList([''])
 
     # def testSearch(self):
     #     tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])

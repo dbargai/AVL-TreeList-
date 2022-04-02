@@ -201,6 +201,11 @@ class AVLNode(object):
 		else:
 			return self.right
 
+	def isLeftSon(self):
+		return self.getParent()!=None and self.getParent().getLeft() is self
+
+	def isRightSon(self):
+		return self.getParent()!=None and self.getParent().getRight() is self
 
 """
 A class implementing the ADT list, using an AVL tree.
@@ -217,6 +222,12 @@ class AVLTreeList(object):
 		self.firstitem= None
 		self.lastitem= None
 		# add your fields here
+
+	def createTreeByRoot(self, root_, first, last):
+		self.root = root_
+		self.firstitem=first
+		self.lastitem=last
+
 
 	"""returns whether the list is empty
 
@@ -507,7 +518,47 @@ class AVLTreeList(object):
 	"""
 	def length(self):
 		return self.root.size
-		
+
+	"""join left_lst and right_lst using a 'middle' node.
+	Time Complexity: O(|left_.height - right_lst.height|)
+	@type left_lst, right_lst: AVLTreeList
+	@type mid = AVLNode
+	@post: left_lst = left_lst + mid + right_lst while left_lst might be UNBALANCED
+	@post: NOTE! $left_lst tree might be UNBALANCED, if you use this method, take care of rebalance
+	@returns: root of left_lst after the join operation
+	"""
+	@staticmethod
+	# def join (left_lst, mid, right_lst):
+	# 	if left_lst.length() > right_lst.length():
+	# 		node=AVLTreeList.findMaximalNodeByHeight(left_lst.getRoot(), right_lst.getRoot().getHeight())
+	# 		left_lst.concat_redirect(mid, node, right_lst.getRoot(), node.getParent(), left_lst.getRoot() ,'R')
+	# 	elif left_lst.length() < right_lst.length():
+	# 		node=AVLTreeList.findMinimalNodeByHeight(right_lst.getRoot(),  left_lst.getRoot().getHeight())
+	# 		left_lst.concat_redirect(mid, left_lst.getRoot(), node, node.getParent(), right_lst.getRoot(), left_lst.getRoot(), 'L')
+	# 	else:
+	# 		node=AVLTreeList.findMinimalNodeByHeight(right_lst.getRoot(), left_lst.getRoot().getHeight())
+	# 		left_lst.concat_redirect(mid, left_lst.getRoot(), node, None, mid, None)
+	# 	left_lst.lastitem=right_lst.lastitem
+	# 	left_lst.rebalance(mid.getParent())
+	# 	return left_lst
+
+
+	def join (left_root, mid, right_root):
+		new_root = None
+		if left_root.getSize() > right_root.getSize():
+			node=AVLTreeList.findMaximalNodeByHeight(left_root, right_root.getHeight())
+			AVLTreeList.concat_redirect(mid, node, right_root, node.getParent(), 'R')
+			new_root = left_root
+		elif left_root.getSize() < right_root.getSize():
+			node=AVLTreeList.findMinimalNodeByHeight(right_root,  left_root.getHeight())
+			AVLTreeList.concat_redirect(mid, left_root, node, node.getParent(), 'L')
+			new_root = right_root
+		else:
+			node=AVLTreeList.findMinimalNodeByHeight(right_root, left_root.getHeight())
+			AVLTreeList.concat_redirect(mid, left_root, node, None, None)
+			new_root = mid
+		return new_root
+
 	"""splits the list at the i'th index
 
 	@type i: int
@@ -518,7 +569,30 @@ class AVLTreeList(object):
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
 	def split(self, i):
-		return None
+		splitter = self.retrieve_node(i)
+		node = splitter
+		while node.getParent() != None:
+			if node.isLeftSon():
+				left_tree = self.createTreeByRoot()
+				right_lst = join()
+			
+
+
+
+		right_lst = AVLTreeList()
+		right_lst.root=node.getRight()
+		left_lst = AVLTreeList()
+		left_lst.root = node.getLeft()
+		while node.getParent()!=None:
+			if node.getParent().getLeft() is node:
+				AVLTreeList.join(right_lst, node.getParent() , node.getParent().getRight())
+			else:
+				left_tree = AVLTreeList().createTreeFromList(node.getParent().getLeft())
+				right_tree = AVLTreeList().createTreeFromList(node.getLeft())
+				AVLTreeList.join(left_tree, node.getParent() , right_tree)
+			node=node.getParent()
+		return [left_lst, splitter ,right_lst]
+
 
 	"""concatenates lst to self
 
@@ -528,27 +602,18 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
 	def concat(self, lst):
-		node = None
+		heights_diff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
 		middle = AVLNode(self.lastitem.getValue())
 		self.delete(self.length()-1)
-		if self.length() > lst.length():
-			node=self.findMaximalNodeByHeight(lst.getRoot().getHeight())
-			self.concat_redirect(middle, node, lst.getRoot(), node.getParent(), self.getRoot() ,'R')
-		elif self.length() < lst.length():
-			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(middle, self.getRoot(), node, node.getParent(), lst.getRoot(), self.getRoot(), 'L')
-		else:
-			node=lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(middle, self.getRoot(), node, None, middle, None)
+		self.root=AVLTreeList.join(self.getRoot(), middle, lst.getRoot())
+		self.lastitem = lst.lastitem
 		self.rebalance(middle.getParent())
-		
-		return None
+		return heights_diff
 
 	"""rebalancing the tree from a given node to the root
 	@rtype: int
 	@returns: a counter of the number of rotations performed
 	"""
-
 	def rebalance(self, start_node):
 		cnt=0
 		while (start_node !=None):
@@ -581,16 +646,17 @@ class AVLTreeList(object):
 			start_node=start_node.getParent()
 		return cnt
 	
+
 	"""returns minimal-index node with height<=h
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	def findMinimalNodeByHeight(self, h):
-		node = self.root
-		while node.height>h:
-			node=node.left
-		return node
+	@staticmethod
+	def findMinimalNodeByHeight(root, h):
+		while root.getHeight()>h:
+			root=root.getLeft()
+		return root
 
 
 	"""returns maximal-index node with height<=h
@@ -598,18 +664,35 @@ class AVLTreeList(object):
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	def findMaximalNodeByHeight(self, h):
-		node = self.root
-		while node.height>h:
-			node=node.right
-		return node
+	@staticmethod
+	def findMaximalNodeByHeight(root, h):
+		while root.height>h:
+			root=root.right
+		return root
 	
 	"""set sons and parents fields for concat (O(1))
 	@rtype: None
 	@pre: $side in {'R', 'L'}
 	@type s: string
 	"""
-	def concat_redirect(self, mid, left, right, parent , newRoot, side):
+	# def concat_redirect(self, mid, left, right, parent , newRoot, side):
+	# 	mid.setLeft(left)
+	# 	mid.getLeft().setParent(mid)
+	# 	mid.setRight(right)
+	# 	mid.getRight().setParent(mid)
+	# 	mid.setParent(parent)
+	# 	mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
+	# 	mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
+	# 	if parent!=None:
+	# 		if (side=='R'):
+	# 			parent.setRight(mid)
+	# 		else:
+	# 			parent.setLeft(mid)
+	# 	self.root = newRoot
+
+	
+	@staticmethod
+	def concat_redirect(mid, left, right, parent, side):
 		mid.setLeft(left)
 		mid.getLeft().setParent(mid)
 		mid.setRight(right)
@@ -622,7 +705,8 @@ class AVLTreeList(object):
 				parent.setRight(mid)
 			else:
 				parent.setLeft(mid)
-		self.root = newRoot
+		#self.root = newRoot
+
 
 	"""searches for a *value* in the list
 
