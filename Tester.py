@@ -396,8 +396,13 @@ class TestMavnatProject1(unittest.TestCase):
     def testSplit(self):
         tree = createTreeFromList(['a','b','c',None,'d','e','f',None,None,None,None,None,'g',None,None])
         result = tree.split(4)
+        self.assertEqual(result[1], 'g')
+        self.assertEqual(result[0].listToArray(), ['b','d','a','e'])
+        self.assertEqual(result[2].listToArray(),['c','f'])
         left_lst=result[0]
         right_lst=result[2]
+
+
         #expceted_right = createTreeFromList([''])
 
     # def testSearch(self):
