@@ -569,29 +569,50 @@ class AVLTreeList(object):
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
 	def split(self, i):
+		left_tree = AVLTreeList()
+		right_tree = AVLTreeList()
+
 		splitter = self.retrieve_node(i)
-		node = splitter
-		while node.getParent() != None:
-			if node.isLeftSon():
-				left_tree = self.createTreeByRoot()
-				right_lst = join()
-			
+		next_son = splitter
+		next_parent = next_son.getParent() # keep original parent 
+										   # in case relaitions will change during iteration
 
+		last_left = next_son.getLeft() # last root of the left list
+		last_right = next_son.getRight() # last root of the right list
 
+		left_tree.firstitem = self.firstitem
+		left_tree.lastitem = AVLTreeList.findMaximalNodeByHeight(last_left, 0)
+		right_tree.firstitem = AVLTreeList.findMinimalNodeByHeight(last_right, 0)
+		right_tree.lastitem = self.lastitem
 
-		right_lst = AVLTreeList()
-		right_lst.root=node.getRight()
-		left_lst = AVLTreeList()
-		left_lst.root = node.getLeft()
-		while node.getParent()!=None:
-			if node.getParent().getLeft() is node:
-				AVLTreeList.join(right_lst, node.getParent() , node.getParent().getRight())
+		while next_parent != None:
+			next_parent_to_set = next_parent.getParent()
+			set_as_left = next_parent.isLeftSon()
+			if next_son.isLeftSon():
+				last_right = AVLTreeList.join(last_right, next_parent, next_parent.getRight())
+				last_right.setParent(next_parent_to_set)
+				next_son = last_right
 			else:
-				left_tree = AVLTreeList().createTreeFromList(node.getParent().getLeft())
-				right_tree = AVLTreeList().createTreeFromList(node.getLeft())
-				AVLTreeList.join(left_tree, node.getParent() , right_tree)
-			node=node.getParent()
-		return [left_lst, splitter ,right_lst]
+				last_left = AVLTreeList.join(next_parent.getLeft(), next_parent, last_left)
+				last_left.setParent(next_parent_to_set)
+				next_son = last_left
+
+			# connect joined tree to the next parent (in case tree structure has changed)
+			if next_parent_to_set!=None:
+				if set_as_left and next_parent_to_set != None:
+					next_parent_to_set.setLeft(last_left)
+				else:
+					next_parent_to_set.setRight(last_right)
+			
+			# update next_parent
+			next_parent= next_parent_to_set
+		
+		last_left.setParent(None)
+		last_right.setParent(None)
+
+		left_tree.root = last_left
+		right_tree.root = last_right
+
 
 
 	"""concatenates lst to self
@@ -697,10 +718,10 @@ class AVLTreeList(object):
 		mid.getLeft().setParent(mid)
 		mid.setRight(right)
 		mid.getRight().setParent(mid)
-		mid.setParent(parent)
 		mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
 		mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
 		if parent!=None:
+			mid.setParent(parent)
 			if (side=='R'):
 				parent.setRight(mid)
 			else:
