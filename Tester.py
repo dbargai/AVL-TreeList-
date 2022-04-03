@@ -387,6 +387,7 @@ class TestMavnatProject1(unittest.TestCase):
         expceted = createTreeFromList(['w','x','a','y','z','b','c'])
         self.assertEqual(expceted.listToArray(), tree1.listToArray())
 
+
         tree1 =createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
         tree2 = createTreeFromList(['a','b','c'])
         tree1.concat(tree2)
