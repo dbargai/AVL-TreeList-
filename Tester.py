@@ -183,12 +183,6 @@ class TestMavnatProject1(unittest.TestCase):
 
         tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
         self.assertEqual(tree1, False)
-
-
-
-
-
-
     
     def testInsert_Rotations(self):
         tree1=AVLTreeList.AVLTreeList()
@@ -250,10 +244,6 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,  tree1.getRoot().left.getHeight()==1)  
         self.assertEqual(True,  tree1.getRoot().getHeight()==3)  
         self.assertEqual(True,  tree1.getRoot().right.getHeight()==2)  
-
-   
-       
-
 
     def testDelete(self):
         tree1= AVLTreeList.AVLTreeList()
@@ -387,13 +377,6 @@ class TestMavnatProject1(unittest.TestCase):
             self.assertEqual(True, isAVL(tree1.getRoot()))
         self.assertEqual(True,tree1.empty())
 
-
-        
-
-    
-        
-        
-
     def testRetrieve(self):
 	### First Tree:        
         avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
@@ -406,6 +389,7 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual('g', avl2.retrieve(6))
         self.assertEqual('h', avl2.retrieve(7))
         self.assertEqual('i', avl2.retrieve(8))
+        self.assertEqual(None, avl2.retrieve(9))
         
     def testSuccessorPre(self):
         tree1= AVLTreeList.AVLTreeList()
@@ -427,20 +411,31 @@ class TestMavnatProject1(unittest.TestCase):
         L.reverse()
         self.assertEqual(True, tree1.listToArray()==L)
 
-    # def testConcat(self):
-    #     tree1 = createTreeFromList(['z','x','w','y',None,None,None])
-    #     tree2 = createTreeFromList(['a','b','c'])
-    #     tree1.concat(tree2)
-    #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
-    #     self.assertEqual(expceted.listToArray(), tree1.listToArray())
-
-    #     tree1 =createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
-    #     tree2 = createTreeFromList(['a','b','c'])
-    #     tree1.concat(tree2)
-    #     expceted = createTreeFromList(['w','x','a','y','z','b','c'])
-    #     self.assertEqual(expceted.listToArray(), tree1.listToArray())
+    def testConcat(self):
+        tree1 = createTreeFromList(['z','x','w','y',None,None,None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
 
 
+        tree1 =createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
+        tree2 = createTreeFromList(['a','b','c'])
+        tree1.concat(tree2)
+        expceted = createTreeFromList(['w','x','a','y','z','b','c'])
+        self.assertEqual(expceted.listToArray(), tree1.listToArray())
+
+    def testSplit(self):
+        tree = createTreeFromList(['a','b','c',None,'d','e','f',None,None,None,None,None,'g',None,None])
+        result = tree.split(4)
+        self.assertEqual(result[1], 'g')
+        self.assertEqual(result[0].listToArray(), ['b','d','a','e'])
+        self.assertEqual(result[2].listToArray(),['c','f'])
+        left_lst=result[0]
+        right_lst=result[2]
+
+
+        #expceted_right = createTreeFromList([''])
 
     # def testSearch(self):
     #     tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
