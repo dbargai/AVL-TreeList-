@@ -860,6 +860,7 @@ class AVLTreeList(object):
 		else:
 			parent.parent.right=leftRightSon
 			leftRightSon.setParent(parent.parent)
+		parent.setParent(leftRightSon)
 		self.updateSize(parent,leftSon,leftRightSon)
 		self.updateHeight(parent,leftSon,leftRightSon)
 		return leftRightSon

@@ -319,12 +319,36 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,  tree1.getRoot().left.getHeight()==1)  
         self.assertEqual(True,  tree1.getRoot().getHeight()==3)  
         self.assertEqual(True,  tree1.getRoot().right.getHeight()==2)
-        l2=[None for i in range(24)] + [15] + [None for i in range(7)]
-        # avl=createTreeFromList([3,0,5,1,1,8,7,0,0,3,7,7,6,16,8,None,None,2,None,None,None,5,2,None,10,4,7,9,6,15,9]+l2)
-        # printTreefinal(avl)
-        # avl.insert(7,7)
-        # printTreefinal(avl)
-        # a=1
+        tree1=AVLTreeList.AVLTreeList()
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(0,10)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(1,20)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(0,5)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(1,9)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(1,8)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(0,3)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(1,4)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(3,6)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        tree1.insert(6,9.5)
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]        
+        # tree1= createTreeFromList([1,1,0,0,0,1,1])
+        printTreefinal(tree1) #[0,1,0,3,1,1,0,1]
+        # printTreefinal(tree1) #[0,1,0,3,1,1,0,1]
+        for i in range(7):
+            print(tree1.retrieve_node(i).getValue())
+        printTreefinal(tree1)
+        printTreefinal(tree1) #[0,1,0,3,1,1,6,0,1]
+        print("")
+
+
 
     def testDelete(self):
         tree1= AVLTreeList.AVLTreeList()
@@ -377,14 +401,14 @@ class TestMavnatProject1(unittest.TestCase):
         tree=AVLTreeList.AVLTreeList()
         L=[]
         for j in range(10):
-            for i in range(10):
+            for i in range(2):
                 tree.insert(i,i)
                 L.append(i)
             for i in range(30):
-                r=random.randrange(0, 9+i)
+                r=random.randrange(0, 1+i)
                 tree.insert(r,r)
                 L.insert(r,r)
-            
+
                 a=tree.listToArray() 
                 b=a==L 
                 if not b:
