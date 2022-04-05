@@ -1,12 +1,87 @@
 import unittest
 import avl_skeleton as AVLTreeList
 import math
-from random import *
+import random  
 
-
+def printTreefinal(tree):
+    out = ""
+    for row in printree(tree.getRoot()):  # need printree.py file
+        out = out + row + "\n"
+    print(out)
 """returns index of given node in the list
 !!! This method is for testing and does not run on O(1), don't use for class methods
 """
+def printree(t, bykey=True):
+    """Print a textual representation of t
+    bykey=True: show keys instead of values"""
+    # for row in trepr(t, bykey):
+    #        print(row)
+    return trepr(t, bykey)
+
+
+def trepr(t, bykey=False):
+    """Return a list of textual representations of the levels in t
+    bykey=True: show keys instead of values"""
+    if t.getSize() == 0:
+        return ["#"]
+
+    thistr = str(t.getValue()) if bykey else str(t.getValue())
+
+    return conc(trepr(t.left, bykey), thistr, trepr(t.right, bykey))
+
+
+def conc(left, root, right):
+    """Return a concatenation of textual represantations of
+    a root node, its left node, and its right node
+    root is a string, and left and right are lists of strings"""
+
+    lwid = len(left[-1])
+    rwid = len(right[-1])
+    rootwid = len(root)
+
+    result = [(lwid + 1) * " " + root + (rwid + 1) * " "]
+
+    ls = leftspace(left[0])
+    rs = rightspace(right[0])
+    result.append(ls * " " + (lwid - ls) * "_" + "/" + rootwid * " " + "\\" + rs * "_" + (rwid - rs) * " ")
+
+    for i in range(max(len(left), len(right))):
+        row = ""
+        if i < len(left):
+            row += left[i]
+        else:
+            row += lwid * " "
+
+        row += (rootwid + 2) * " "
+
+        if i < len(right):
+            row += right[i]
+        else:
+            row += rwid * " "
+
+        result.append(row)
+
+    return result
+
+
+def leftspace(row):
+    """helper for conc"""
+    # row is the first row of a left node
+    # returns the index of where the second whitespace starts
+    i = len(row) - 1
+    while row[i] == " ":
+        i -= 1
+    return i + 1
+
+
+def rightspace(row):
+    """helper for conc"""
+    # row is the first row of a right node
+    # returns the index of where the first whitespace ends
+    i = 0
+    while row[i] == " ":
+        i += 1
+    return i
 
 
 def indexOf(node):
@@ -243,7 +318,10 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,  tree1.getRoot().right.getSize()==5)  
         self.assertEqual(True,  tree1.getRoot().left.getHeight()==1)  
         self.assertEqual(True,  tree1.getRoot().getHeight()==3)  
-        self.assertEqual(True,  tree1.getRoot().right.getHeight()==2)  
+        self.assertEqual(True,  tree1.getRoot().right.getHeight()==2)
+    
+
+
 
     def testDelete(self):
         tree1= AVLTreeList.AVLTreeList()
@@ -291,33 +369,93 @@ class TestMavnatProject1(unittest.TestCase):
             self.assertEqual(True,tree1.empty()==True) 
                        
 
-    def randomTrees(self):
-        x=None
+    def testrandomTrees(self):
+        random.seed(10)
         tree=AVLTreeList.AVLTreeList()
         L=[]
-        for j in range(10):
-            for i in range(10):
+        for j in range(50):
+            for i in range(2):
                 tree.insert(i,i)
-                L.append(i)
+                L.insert(i,i)
             for i in range(30):
-                r=random.randrange(0, 9+i)
+                r=random.randrange(0, 1+i)
                 tree.insert(r,r)
-                L.insert(r,r)
+                L.insert(r,r)    
                 self.assertEqual(True, tree.listToArray()==L)
                 self.assertEqual(True, isAVL(tree.getRoot()))
             for i in range(20):
-                r=random.randrange(0,20)
+                r=random.randrange(0,20-i)
+                self.assertEqual(True, tree.retrieve(r)==L[r])
                 tree.delete(r)
-                L.remove(r)
-                self.assertEqual(True, isAVL(tree.getRoot()))                
+                del L[r]
+
+                T=tree.listToArray()
+                self.assertEqual(True, isAVL(tree.getRoot()))              
                 self.assertEqual(True, tree.listToArray()==L)
                 self.assertEqual(True, tree.first()==L[0])
-                self.assertEqual(True, tree.last==L[len(L)-1])
-                self.assertEqual(True, tree.length==len(L))
+                a= tree.last()
+                b= L[len(L)-1]
+                self.assertEqual(True, tree.last()==L[len(L)-1])
+                self.assertEqual(True, tree.length()==len(L))
                 self.assertEqual(True, tree.listToArray()==L)
-                self.assertEqual(True, tree.retrieve(i)==L[i])
+
+    def test_all_tree_operations(self):
+        tree1=AVLTreeList.AVLTreeList()
+        tree2=AVLTreeList.AVLTreeList()
+        L1=[]
+        L2=[]
+        for i in range(17):
+            L1.append(i)
+            tree1.insert(i,i)
+        tree2.insert(0,20)
+        tree2.insert(1,22)
+        tree2.insert(2,24)
+        tree2.insert(0,19)
+        tree2.insert(0,18)
+        tree2.insert(3,21)    
+        tree2.insert(5,23)    
+        tree2.insert(0,17)
+        L2=[i for i in range(17,25)]
+        self.assertEqual(True,tree1.listToArray()==L1)
+        self.assertEqual(True,tree1.length()==len(L1))
+        self.assertEqual(True,tree1.first()==L1[0])
+        self.assertEqual(True,tree1.last()==L1[len(L1)-1])
+        self.assertEqual(True,tree2.listToArray()==L2)
+        self.assertEqual(True,tree1.length()==len(L1))
+        self.assertEqual(True,tree2.first()==L2[0])
+        self.assertEqual(True,tree2.last()==L2[len(L2)-1])
+        self.assertEqual(True,isAVL(tree2.getRoot()))
+        self.assertEqual(True,isAVL(tree1.getRoot()))
+        tree1.concat(tree2)
+        self.assertEqual(True,isAVL(tree1.getRoot()))
+        L1.extend(L2)
+        self.assertEqual(True,tree1.listToArray()==L1)
+        for i in range(24,19,-1):
+            L1.remove(i)
+            a=tree1.retrieve_node(i-2)
+            tree1.delete(i)
+            self.assertEqual(True,isAVL(tree1.getRoot()))
+        for i in range(20):
+            self.assertEqual(True,tree1.retrieve(i)==L1[i])
+        for i in range(20):
+            self.assertEqual(True,tree1.search(i)==L1[i])
+        left=L1[:10]
+        right=L1[10:]
+        treesplit=tree1.split(10)
+        a=treesplit[0].listToArray()
+        # self.assertEqual(True,treesplit[0].listToArray()==left)
+        # self.assertEqual(True,treesplit[0].first()==left[0])
+        # self.assertEqual(True,treesplit[0].last()==left[len(left)-1])
+        # self.assertEqual(True,isAVL(treesplit[0]))
+        # self.assertEqual(True,treesplit[2].listToArray()==right)
+        # self.assertEqual(True,isAVL(treesplit[2]))
+        # self.assertEqual(True,treesplit[1].listToArray()==[10])
+        # self.assertEqual(True,treesplit[2].first()==right[0])
+        # self.assertEqual(True,treesplit[2].last()==right[len(right)-1])
 
 
+
+        
 
 
     def testMediumTreesOperations(self):

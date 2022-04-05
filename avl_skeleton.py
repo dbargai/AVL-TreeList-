@@ -14,6 +14,7 @@ from tkinter import N
 from tkinter.messagebox import NO
 from turtle import left
 import math
+import Tester 
 
 
 class AVLNode(object):
@@ -413,7 +414,7 @@ class AVLTreeList(object):
 		last=False
 		if self.length()!=1:
 			last=True if i==self.length()-1 else False
-			last=True if i==0 else False
+			first=True if i==0 else False
 		else: #delete the only item and its the root
 			self.lastitem=None
 			self.firstitem=None
@@ -651,6 +652,7 @@ class AVLTreeList(object):
 	@returns: a counter of the number of rotations performed
 	"""
 	def rebalance(self, start_node):
+		# Tester.printTreefinal(self)
 		cnt=0
 		while (start_node !=None):
 			if abs(start_node.getBF())==2: 
@@ -858,6 +860,7 @@ class AVLTreeList(object):
 		else:
 			parent.parent.right=leftRightSon
 			leftRightSon.setParent(parent.parent)
+		parent.setParent(leftRightSon)
 		self.updateSize(parent,leftSon,leftRightSon)
 		self.updateHeight(parent,leftSon,leftRightSon)
 		return leftRightSon
