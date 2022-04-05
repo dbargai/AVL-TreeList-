@@ -1,4 +1,5 @@
 import unittest
+from venv import create
 import avl_skeleton as AVLTreeList
 import math
 import random  
@@ -199,8 +200,72 @@ def createTreeFromList_rec(lst, i, power):
         node.setHeight(-2)
         return node
 
+""" returns true if trees are totally equal, false if not
+    comparison between all fields of each node and all fields of the tree itself
+"""
+def compareTrees(tree1, tree2):
+    if compareNodes(tree1.firstitem,tree2.firstitem) and compareNodes(tree1.lastitem,tree2.lastitem):
+        return compareTreesRec(tree1.getRoot(), tree2.getRoot())
+    return False
+    
+def compareTreesRec(root1, root2):
+    if not root1.isRealNode() or not root2.isRealNode():
+        return compareNodes(root1, root2)
+    if not compareTreesRec(root1.getLeft(), root2.getLeft()):
+        return False
+    elif not compareNodes(root1, root2):
+        return False
+    elif not compareTreesRec(root1.getRight(), root2.getRight()):
+        return False
+    return True
+
+
+""" return true if 2 nodes are equal by size, height, value
+@pre: root1 and root2 are AVLNodes types
+"""
+def compareNodes(node1, node2):
+    return node1.getSize()==node2.getSize() and \
+            node1.getValue()==node2.getValue() and \
+            node1.getHeight() == node2.getHeight()
+                    
+
 
 class TestMavnatProject1(unittest.TestCase):
+
+    def testCompareTrees(self):
+        # Fix AVLTreeList constructor before activating this test:
+        # tree1 = createTreeFromList([])
+        # tree2 = createTreeFromList([])
+        # self.assertEqual(compareTrees(tree1, tree2), True)
+
+        tree1 = createTreeFromList(["a","b","c","d","e","f","g","h","i",None, None, None,None, None,None])
+        tree2 = createTreeFromList(["a","b","c","d","e","f","g","h","i",None, None, None,None, None,None])
+        self.assertEqual(compareTrees(tree1, tree2), True)
+        self.assertEqual(printTreefinal(tree1), printTreefinal(tree2))
+
+        tree1 = createTreeFromList(["a"])
+        tree2 = createTreeFromList(["a"])
+        self.assertEqual(compareTrees(tree1, tree2), True)
+
+        tree1 = createTreeFromList(["a","b","c","d","e","f","g","h","i",None, None, None,None, None,None])
+        tree2 = createTreeFromList(["a","b","d","c","e","f","g","h","i",None, None, None,None, None,None])
+        self.assertEqual(compareTrees(tree1, tree2), False)
+
+        tree1 = createTreeFromList(["a","b","c","d","e","f","g","h","i",None, None, None,None, None,None])
+        tree2 = createTreeFromList(["a","b","d","c","e","f","g","h",None, None, None,None, None,None,None])
+        self.assertEqual(compareTrees(tree1, tree2), False)
+
+        tree1 = createTreeFromList(["b","c","d","e","f","g","h","i",None, None, None,None, None,None,None])
+        tree2 = createTreeFromList(["a","b","d","c","e","f","g","h","i",None, None, None,None, None,None])
+        self.assertEqual(compareTrees(tree1, tree2), False)
+
+        tree1 = createTreeFromList(["a"])
+        tree2 = createTreeFromList(["b"])
+        self.assertEqual(compareTrees(tree1, tree2), False)
+
+        tree1 = createTreeFromList(["a"])
+        tree2 = createTreeFromList(["b","c",None])
+        self.assertEqual(compareTrees(tree1, tree2), False)
 
 
     def testCreateTreeFromList(self):
