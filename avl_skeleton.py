@@ -220,8 +220,8 @@ class AVLTreeList(object):
 	"""
 	def __init__(self):
 		self.root = AVLNode(None)
-		self.firstitem= None
-		self.lastitem= None
+		self.firstitem= self.root
+		self.lastitem= self.root
 		# add your fields here
 
 	def createTreeByRoot(self, root_, first, last):

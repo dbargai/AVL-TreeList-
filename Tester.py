@@ -206,8 +206,8 @@ class TestMavnatProject1(unittest.TestCase):
     def testCreateTreeFromList(self):
         tree1 = createTreeFromList([])
         self.assertEqual(tree1.length(), 0)
-        self.assertEqual(tree1.firstitem, None)
-        self.assertEqual(tree1.lastitem, None)
+        self.assertEqual(tree1.firstitem.getSize(), 0)
+        self.assertEqual(tree1.lastitem.getSize(), 0)
         self.assertEqual(tree1.getRoot().getLeft(), None)
         self.assertEqual(tree1.getRoot().getRight(), None)
         self.assertEqual(tree1.getRoot().getParent(), None)
