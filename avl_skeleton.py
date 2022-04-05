@@ -415,9 +415,6 @@ class AVLTreeList(object):
 		if self.length()!=1:
 			last=True if i==self.length()-1 else False
 			first=True if i==0 else False
-		else: #delete the only item and its the root
-			self.lastitem=None
-			self.firstitem=None
 		node= self.retrieve_node(i)
 		if last:
 			self.lastitem=self.predecessor(node)
