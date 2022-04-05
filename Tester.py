@@ -271,8 +271,8 @@ class TestMavnatProject1(unittest.TestCase):
     def testCreateTreeFromList(self):
         tree1 = createTreeFromList([])
         self.assertEqual(tree1.length(), 0)
-        self.assertEqual(tree1.firstitem, None)
-        self.assertEqual(tree1.lastitem, None)
+        self.assertEqual(tree1.firstitem.getSize(), 0)
+        self.assertEqual(tree1.lastitem.getSize(), 0)
         self.assertEqual(tree1.getRoot().getLeft(), None)
         self.assertEqual(tree1.getRoot().getRight(), None)
         self.assertEqual(tree1.getRoot().getParent(), None)
@@ -389,6 +389,21 @@ class TestMavnatProject1(unittest.TestCase):
 
 
     def testDelete(self):
+        emptytree= AVLTreeList.AVLTreeList()
+        emptytree2= AVLTreeList.AVLTreeList()
+        self.assertEqual(compareTrees(emptytree, emptytree2), True)
+        self.assertEqual(emptytree.first()==emptytree2.first(), True)
+        self.assertEqual(emptytree.last()==emptytree2.last(), True)
+        self.assertEqual(printTreefinal(emptytree), printTreefinal(emptytree2))
+        for i in range(10):
+            emptytree.insert(i,i)
+        self.assertEqual(compareTrees(emptytree, emptytree2), False)
+        for i in range(9,-1,-1):
+            emptytree.delete(i)
+        self.assertEqual(compareTrees(emptytree, emptytree2), True)
+        self.assertEqual(emptytree.first()==emptytree2.first(), True)
+        self.assertEqual(emptytree.last()==emptytree2.last(), True)
+        self.assertEqual(printTreefinal(emptytree), printTreefinal(emptytree2))
         tree1= AVLTreeList.AVLTreeList()
         for i in range(6,-1,-1):
             tree1.insert(0,i)
