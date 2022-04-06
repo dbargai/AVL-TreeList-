@@ -718,7 +718,9 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(heights_diff,4)
 
         
-
+        ###########################
+        # Case 3 - Large lists
+        ###########################
 
 
         tree1 = createTreeFromList(['z','x','w','y',None,None,None])
