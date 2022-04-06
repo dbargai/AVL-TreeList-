@@ -507,6 +507,7 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,isAVL(tree2.getRoot()))
         self.assertEqual(True,isAVL(tree1.getRoot()))
         tree1.concat(tree2)
+        a=tree1.listToArray()
         self.assertEqual(True,isAVL(tree1.getRoot()))
         L1.extend(L2)
         self.assertEqual(True,tree1.listToArray()==L1)
@@ -629,7 +630,7 @@ class TestMavnatProject1(unittest.TestCase):
         L.reverse()
         self.assertEqual(True, tree1.listToArray()==L)
 
-    def testConcat(self):
+    def Concat(self):
         #############################
         # Case 1 - edge cases:
         #############################
