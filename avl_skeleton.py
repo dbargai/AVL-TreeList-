@@ -531,10 +531,17 @@ class AVLTreeList(object):
 
 
 	def join (self, mid, right_lst):
-		if self.length() > right_lst.length():
+		if self.length() == 0:
+			self.firstitem = mid if mid!=None else right_lst.firstitem
+		if right_lst.length() == 0:
+			self.lastitem=mid if mid !=None else self.lastitem
+		else:
+			self.lastitem=right_lst.lastitem
+		
+		if self.getRoot().getHeight() > right_lst.getRoot().getHeight():
 			node=AVLTreeList.findMaximalNodeByHeight(self.getRoot(), right_lst.getRoot().getHeight())
 			self.concat_redirect(mid, node, right_lst.getRoot(), node.getParent(), self.getRoot(), 'R')
-		elif self.length() < right_lst.length():
+		elif self.getRoot().getHeight() < right_lst.getRoot().getHeight():
 			node=AVLTreeList.findMinimalNodeByHeight(right_lst.getRoot(),  self.getRoot().getHeight())
 			self.concat_redirect(mid, self.getRoot(), node, node.getParent(), right_lst.getRoot(), 'L')
 		else:
@@ -641,16 +648,18 @@ class AVLTreeList(object):
 
 		# edge cases: one if the lists is empty:
 		if self.length()==0:
-			self = lst
+			self.root = lst.getRoot()
+			self.firstitem = lst.firstitem
+			self.lastitem = lst.lastitem
 			return heights_diff
 		if lst.length()==0:
 			return heights_diff
 
 		# if both lists aren't empty:
-		middle = self.lastitem
+		val = self.lastitem.getValue()
+		middle = AVLNode(val)
 		self.delete(self.length()-1)
 		self.join(middle, lst)
-		self.lastitem = lst.lastitem
 		return heights_diff
 
 	"""rebalancing the tree from a given node to the root
@@ -661,7 +670,7 @@ class AVLTreeList(object):
 		# Tester.printTreefinal(self)
 		cnt=0
 		while (start_node !=None):
-			if abs(start_node.getBF())==2: 
+			if abs(start_node.getBF())==2:
 				if start_node.getBF()<0:
 					if start_node.getRight().getBF()==1:
 						start_node=self.rotateRightThenLeft(start_node, start_node.getRight(), start_node.getRight().getLeft())

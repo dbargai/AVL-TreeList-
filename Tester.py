@@ -646,7 +646,7 @@ class TestMavnatProject1(unittest.TestCase):
         tree1 = createTreeFromList([]) # empty list
         tree2 = createTreeFromList(["a"]) # [a]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList([])), True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["a"])), True)
         self.assertEqual(heights_diff, 1)
 
         # Testcase3: [a] + [] = [a]:
@@ -657,46 +657,46 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(heights_diff, 1)
 
         # Testcase4: [a,b,c] + [d,e,f] = [a,b,c,d,e,f]:
-        tree1 = createTreeFromList(["a","b","c"]) # [a,b,c]
+        tree1 = createTreeFromList(["b","a","c"]) # [a,b,c]
         tree2 = createTreeFromList(["e","d","f"]) # [d,e,f] 
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["c","b","e","a",None,"d","f"])), True)
         self.assertEqual(heights_diff, 0)
 
-        # Testcase4: [a] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [a,b,c,d,e,f,g,h,i,j,k,l,m,n]:
+        # Testcase5: [a] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [a,b,c,d,e,f,g,h,i,j,k,l,m,n]:
         tree1 = createTreeFromList(["a"]) # [a]
         tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n","a"] + [None]*15)),True)
-        self.assertEqual(heights_diff, 12)
+        self.assertEqual(heights_diff,3)
 
-        # TestCase5: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [a] = [b,c,d,e,f,g,h,i,j,k,l,m,n,a]:
+        # TestCase6: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [a] = [b,c,d,e,f,g,h,i,j,k,l,m,n,a]:
         tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         tree2 = createTreeFromList(["a"]) # [a]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]+[None]*15+["a"])),True)
-        self.assertEqual(heights_diff, 12)
+        self.assertEqual(heights_diff, 3)
 
 
-        # TestCase6: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
+        # TestCase7: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
         tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         tree2 = createTreeFromList([]) #[]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"])),True)
-        self.assertEqual(heights_diff, 13)
+        self.assertEqual(heights_diff, 4)
 
-        # Testcase7: [] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
+        # Testcase8: [] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
         tree1 = createTreeFromList([]) #[]
         tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"])),True)
-        self.assertEqual(heights_diff, 13)
+        self.assertEqual(heights_diff, 4)
 
-        # TestCase8: [a] + [a] = [a,a]:
+        # TestCase9: [a] + [a] = [a,a]:
         tree1 = createTreeFromList(["a"])
         tree2 = createTreeFromList(["a"])
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["a"])),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["a","a",None])),True)
         self.assertEqual(heights_diff, 0)
         ######################################################################
 
@@ -704,19 +704,19 @@ class TestMavnatProject1(unittest.TestCase):
         # Case 2 - Rebalance cases:
         ###########################
 
-        # Testcase9: (one right rebalance nedded) [a,b,c,x] + [A,B,C,D,E] = [a,b,c,x,A,B,C,D,E]
+        # Testcase10: (one right rebalance nedded) [a,b,c,x] + [A,B,C,D,E] = [a,b,c,x,A,B,C,D,E]
         tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         tree2 = createTreeFromList(["D","B","E","A","C",None, None]) # [A,B,C,D,E]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["x","b","D","a","c","B","E"]+[None]*4+["A","C",None, None, None,"x"])),True)
-        self.assertEqual(heights_diff, 1)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["x","b","D","a","c","B","E"]+[None]*4+["A","C",None, None])),True)
+        self.assertEqual(heights_diff, 0)
 
-        # TestCase10: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
+        # TestCase11: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
         tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         tree2 = createTreeFromList(["F","D","H","B","E","G",None,"A","C"]+[None]*6) # [A,B,C,D,E,F,G,H]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
-        self.assertEqual(heights_diff,4)
+        self.assertEqual(heights_diff,1)
 
         
         ###########################
