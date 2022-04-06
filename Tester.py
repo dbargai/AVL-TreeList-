@@ -629,7 +629,7 @@ class TestMavnatProject1(unittest.TestCase):
         L.reverse()
         self.assertEqual(True, tree1.listToArray()==L)
 
-    def testConcat(self):
+    def Concat(self):
         #############################
         # Case 1 - edge cases:
         #############################
