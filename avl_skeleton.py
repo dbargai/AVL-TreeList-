@@ -636,9 +636,18 @@ class AVLTreeList(object):
 	@rtype: int
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
-	def concat(self, lst):
+	def concat(self, lst):			
 		heights_diff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
-		middle = AVLNode(self.lastitem.getValue())
+
+		# edge cases: one if the lists is empty:
+		if self.length()==0:
+			self = lst
+			return heights_diff
+		if lst.length()==0:
+			return heights_diff
+
+		# if both lists aren't empty:
+		middle = self.lastitem
 		self.delete(self.length()-1)
 		self.join(middle, lst)
 		self.lastitem = lst.lastitem
