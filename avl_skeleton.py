@@ -33,24 +33,19 @@ class AVLNode(object):
 		self.size = 0
 		
 	
-	###############################################
-	# This methods has no use right now
-	# delete them before submit if there's no use for it till that point
-	#################################################
-
-	# """Set all node fields by given
-	# @type value: str
-	# @type left, right, parent: AVLNode
-	# @type height, size: int
-	# @param value: data of your node
-	# """
-	# def setFields(self, value, left, right, parent, height, size):
-	# 	self.value = value
-	# 	self.left = left
-	# 	self.right = right
-	# 	self.parent = parent
-	# 	self.height = height
-	# 	self.size = size
+	"""Set all node fields by given
+	@type value: str
+	@type left, right, parent: AVLNode
+	@type height, size: int
+	@param value: data of your node
+	"""
+	def setFields(self, value, left, right, parent, height, size):
+		self.value = value
+		self.left = left
+		self.right = right
+		self.parent = parent
+		self.height = height
+		self.size = size
 
 
 	##################################

@@ -718,11 +718,31 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
         self.assertEqual(heights_diff,1)
 
-        
+        # # TestCase12: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
+        # tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
+        # tree2 = createTreeFromList(["x1",None,"x2",None,None,None,"x3",None, None, None,None, None,None, None])
+        # heights_diff = tree1.concat(tree2)
+        # self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
+        # self.assertEqual(heights_diff,1)
+
+
+        # two types of rotations
+
         ###########################
         # Case 3 - Large lists
         ###########################
 
+        # TestCase13: [a]*1023 + [x]*1023:
+        tree1 = createTreeFromList(["a"]*1023) # [a]*1023
+        tree2 = createTreeFromList(["x"]*1023) # [x]*1023
+        heights_diff = tree1.concat(tree2)
+        lst = ["a"]
+        for i in range(9):
+            lst += ["a"]*(2**i) + ["x"]*(2**i)
+        lst += ["a"]*511 + [None] + ["x"]*512
+        result = createTreeFromList(lst)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(lst)), True)
+        self.assertEqual(heights_diff,0)
 
         tree1 = createTreeFromList(['z','x','w','y',None,None,None])
         tree2 = createTreeFromList(['a','b','c'])
