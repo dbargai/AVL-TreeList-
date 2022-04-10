@@ -523,6 +523,7 @@ class TestMavnatProject1(unittest.TestCase):
         right=L1[10:]
         treesplit=tree1.split(10)
         a=treesplit[0].listToArray()
+        b=treesplit[2].listToArray()
         # self.assertEqual(True,treesplit[0].listToArray()==left)
         # self.assertEqual(True,treesplit[0].first()==left[0])
         # self.assertEqual(True,treesplit[0].last()==left[len(left)-1])
