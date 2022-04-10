@@ -507,7 +507,6 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,isAVL(tree2.getRoot()))
         self.assertEqual(True,isAVL(tree1.getRoot()))
         tree1.concat(tree2)
-        a=tree1.listToArray()
         self.assertEqual(True,isAVL(tree1.getRoot()))
         L1.extend(L2)
         self.assertEqual(True,tree1.listToArray()==L1)
@@ -521,19 +520,38 @@ class TestMavnatProject1(unittest.TestCase):
         for i in range(20):
             self.assertEqual(True,tree1.search(i)==L1[i])
         left=L1[:10]
-        right=L1[10:]
+        right=L1[11:]
         treesplit=tree1.split(10)
-        a=treesplit[0].listToArray()
-        # self.assertEqual(True,treesplit[0].listToArray()==left)
-        # self.assertEqual(True,treesplit[0].first()==left[0])
-        # self.assertEqual(True,treesplit[0].last()==left[len(left)-1])
+        a=treesplit[0].first()
+        b=treesplit[2].first()
+        c=treesplit[0].last()
+        d=treesplit[2].last()
+        self.assertEqual(True,treesplit[0].listToArray()==left)
+        self.assertEqual(True,treesplit[0].first()==left[0])
+        self.assertEqual(True,treesplit[0].last()==left[len(left)-1])
         # self.assertEqual(True,isAVL(treesplit[0]))
-        # self.assertEqual(True,treesplit[2].listToArray()==right)
+        self.assertEqual(True,treesplit[2].listToArray()==right)
         # self.assertEqual(True,isAVL(treesplit[2]))
-        # self.assertEqual(True,treesplit[1].listToArray()==[10])
-        # self.assertEqual(True,treesplit[2].first()==right[0])
-        # self.assertEqual(True,treesplit[2].last()==right[len(right)-1])
+        self.assertEqual(True,treesplit[1]==10)
+        self.assertEqual(True,treesplit[2].first()==right[0])
+        a= treesplit[2].last()
+        b=right[len(right)-1]
+        self.assertEqual(True,treesplit[2].last()==right[len(right)-1])
 
+        del L1,L2,tree1,tree2,a,b,c,d,i,left,right
+        ####### Test Case 2, checking split first and last########
+        tree = AVLTreeList.AVLTreeList()
+        for i in range(5):
+            tree.insert(i,i) #[0,1,2,3,4]
+        print(printTreefinal(tree))
+        splitted=tree.split(2) # [0,1],2,[3,4]
+        left=splitted[0]
+        right=splitted[2]
+        print(printTreefinal(splitted[0]))
+        print(printTreefinal(splitted[2]))
+        print((splitted[1]))
+        x=1
+        
 
 
         
@@ -552,6 +570,7 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,tree1.getRoot().getValue()==7)
         for i in range(15,2**10-1):
             tree1.insert(i,i)
+        
         self.assertEqual(True,isAVL(tree1.getRoot()))    
         self.assertEqual(True,tree1.length()==2**10-1)
         self.assertEqual(True,tree1.getRoot().getHeight()==9)
@@ -655,7 +674,7 @@ class TestMavnatProject1(unittest.TestCase):
 
 
         ####################################
-        # Case 3: Lasrge list
+        # Case 3: Large list
         ####################################
         # Testcase1: [x1]*1023 + [A] + [x2]*1023 + [B] + [x3]*1023 + [C] + [x4]*1023
         lst = ["B","A","C"]
