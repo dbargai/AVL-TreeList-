@@ -445,7 +445,7 @@ class AVLTreeList(object):
 			self.lastitem=self.root
 			return 0
 		if i==self.length(): #maintain first and last pointers
-			max=self.retrieve_node(i-1)
+			max=self.lastitem
 			node=max.getRight()
 			self.createNode(node,val)
 			self.lastitem=node
@@ -613,10 +613,6 @@ class AVLTreeList(object):
 		last_left = next_son.getLeft() # last root of the left list
 		last_right = next_son.getRight() # last root of the right list
 
-		left_tree.firstitem = self.firstitem
-		left_tree.lastitem = AVLTreeList.findMaximalNodeByHeight(last_left, 0)
-		right_tree.firstitem = AVLTreeList.findMinimalNodeByHeight(last_right, 0)
-		right_tree.lastitem = self.lastitem
 
 		while next_parent != None:
 			next_parent_to_set = next_parent.getParent()
@@ -639,6 +635,10 @@ class AVLTreeList(object):
 			
 			# update next_parent
 			next_parent= next_parent_to_set
+		left_tree.firstitem = self.firstitem
+		left_tree.lastitem = AVLTreeList.findMaximalNodeByHeight(last_left, 0)
+		right_tree.firstitem = AVLTreeList.findMinimalNodeByHeight(last_right, 0)
+		right_tree.lastitem = self.lastitem
 		
 		last_left.setParent(None)
 		last_right.setParent(None)
