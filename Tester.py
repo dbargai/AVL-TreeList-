@@ -798,7 +798,7 @@ class TestMavnatProject1(unittest.TestCase):
         tree1 = createTreeFromList(["D","B","E","A","C",None, None]) # [A,B,C,D,E]
         tree2 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["E","B","a","A","D","b","c"]+[None]*2+["C",None, None, None, "x"])),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["E","B","b","A","D","a","c"]+[None]*2+["C",None, None, None,None, "x"])),True)
         self.assertEqual(heights_diff, 0)
 
         # TestCase12: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
