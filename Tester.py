@@ -597,6 +597,88 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(True,tree1.empty())
 
     def testRetrieve(self):
+        ######################
+        # Case 1: Edge Cases
+        ######################
+        # Testcase1: [], 0 - expected: None
+        tree = createTreeFromList([])
+        self.assertEqual(tree.retrieve(0), None)
+        # Testcase2: [], 20 - expected: None
+        self.assertEqual(tree.retrieve(20), None)
+        # Testcase3: [a], 0 - expected: a
+        tree = createTreeFromList(["a"])
+        self.assertEqual(tree.retrieve(0), "a")
+        # Testcase4: [a], 1 - expected: None
+        self.assertEqual(tree.retrieve(1), None)
+        
+
+        ####################################
+        # Case 2: Retrive all nodes
+        ####################################
+        # Testcase1: [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o], {0,1,2,3,4,5,....,15}
+        tree = createTreeFromList(["h","d","l","b","f","j","n","a","c","e","g","i","k","m","o"])
+        self.assertEqual(tree.retrieve(0),"a")
+        self.assertEqual(tree.retrieve(1),"b")
+        self.assertEqual(tree.retrieve(2),"c")
+        self.assertEqual(tree.retrieve(3),"d")
+        self.assertEqual(tree.retrieve(4),"e")
+        self.assertEqual(tree.retrieve(5),"f")
+        self.assertEqual(tree.retrieve(6),"g")
+        self.assertEqual(tree.retrieve(7),"h")
+        self.assertEqual(tree.retrieve(8),"i")
+        self.assertEqual(tree.retrieve(9),"j")
+        self.assertEqual(tree.retrieve(10),"k")
+        self.assertEqual(tree.retrieve(11),"l")
+        self.assertEqual(tree.retrieve(12),"m")
+        self.assertEqual(tree.retrieve(13),"n")
+        self.assertEqual(tree.retrieve(14),"o")
+        self.assertEqual(tree.retrieve(15),None)
+        self.assertEqual(tree.retrieve(-1), None)
+        
+
+        ####################################
+        # Case 3: Retrive splecial node
+        ####################################
+        # Testcase1: retrieve root
+        tree = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
+        self.assertEqual(tree.retrieve(6), "h")
+        # Testcase2: retrieve leaf
+        self.assertEqual(tree.retrieve(7),"i")
+        # Testcase3: retrieve node with only left son
+        self.assertEqual(tree.retrieve(8),"j")
+        # Testcase4: retrieve node with only right son
+        self.assertEqual(tree.retrieve(4),"f")
+        # Tesrcase5: retrieve lastitem
+        self.assertEqual(tree.retrieve(0), "b")
+        # Testcase6: retrive firstitem
+        self.assertEqual(tree.retrieve(12), "n")
+
+
+        ####################################
+        # Case 3: Lasrge list
+        ####################################
+        # Testcase1: [x1]*1023 + [A] + [x2]*1023 + [B] + [x3]*1023 + [C] + [x4]*1023
+        lst = ["B","A","C"]
+        for i in range (10):
+            lst += ["x1"]*(2**i) + ["x2"]*(2**i) + ["x3"]*(2**i) + ["x4"]*(2**i)
+        tree = createTreeFromList(lst)
+        self.assertEqual(tree.retrieve(0), "x1")
+        self.assertEqual(tree.retrieve(500), "x1")
+        self.assertEqual(tree.retrieve(1022), "x1")
+        self.assertEqual(tree.retrieve(1023), "A")
+        self.assertEqual(tree.retrieve(1024), "x2")
+        self.assertEqual(tree.retrieve(2000),"x2")
+        self.assertEqual(tree.retrieve(2046),"x2")
+        self.assertEqual(tree.retrieve(2047),"B")
+        self.assertEqual(tree.retrieve(2048),"x3")
+        self.assertEqual(tree.retrieve(3000),"x3")
+        self.assertEqual(tree.retrieve(3070),"x3")
+        self.assertEqual(tree.retrieve(3071),"C")
+        self.assertEqual(tree.retrieve(3072),"x4")
+        self.assertEqual(tree.retrieve(4000),"x4")
+        self.assertEqual(tree.retrieve(4094),"x4")
+        self.assertEqual(tree.retrieve(4095), None)
+
 	### First Tree:        
         avl2=createTreeFromList(['f','b','h','a','d', 'g','i', None, None, 'c', 'e' ,None, None, None, None])
         self.assertEqual('a', avl2.retrieve(0))
@@ -665,31 +747,31 @@ class TestMavnatProject1(unittest.TestCase):
 
         # Testcase5: [a] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [a,b,c,d,e,f,g,h,i,j,k,l,m,n]:
         tree1 = createTreeFromList(["a"]) # [a]
-        tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
+        tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n","a"] + [None]*15)),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n","a"] + [None]*15)),True)
         self.assertEqual(heights_diff,3)
 
         # TestCase6: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [a] = [b,c,d,e,f,g,h,i,j,k,l,m,n,a]:
-        tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
+        tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         tree2 = createTreeFromList(["a"]) # [a]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]+[None]*15+["a"])),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]+[None]*15+["a"])),True)
         self.assertEqual(heights_diff, 3)
 
 
         # TestCase7: [b,c,d,e,f,g,h,i,j,k,l,m,n] + [] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
-        tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
+        tree1 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         tree2 = createTreeFromList([]) #[]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"])),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"])),True)
         self.assertEqual(heights_diff, 4)
 
         # Testcase8: [] + [b,c,d,e,f,g,h,i,j,k,l,m,n] = [b,c,d,e,f,g,h,i,j,k,l,m,n]:
         tree1 = createTreeFromList([]) #[]
-        tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
+        tree2 = createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"]) # [b,c,d,e,f,g,h,i,j,k,l,m,n]
         heights_diff = tree1.concat(tree2)
-        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g",None,"i","l","n"])),True)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["h","e","k","c","f","j","m","b","d",None,"g","i",None,"l","n"])),True)
         self.assertEqual(heights_diff, 4)
 
         # TestCase9: [a] + [a] = [a,a]:
@@ -711,22 +793,36 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(compareTrees(tree1, createTreeFromList(["x","b","D","a","c","B","E"]+[None]*4+["A","C",None, None])),True)
         self.assertEqual(heights_diff, 0)
 
-        # TestCase11: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
+        # Testcase11: (opposite if Testcase10) [A,B,C,D,E] + [a,b,c,x] = [A,B,C,D,E,a,b,c,x]
+        # Here dleteing the lastitem will cause a rotaion
+        tree1 = createTreeFromList(["D","B","E","A","C",None, None]) # [A,B,C,D,E]
+        tree2 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
+        heights_diff = tree1.concat(tree2)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["E","B","a","A","D","b","c"]+[None]*2+["C",None, None, None, "x"])),True)
+        self.assertEqual(heights_diff, 0)
+
+        # TestCase12: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
         tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         tree2 = createTreeFromList(["F","D","H","B","E","G",None,"A","C"]+[None]*6) # [A,B,C,D,E,F,G,H]
         heights_diff = tree1.concat(tree2)
         self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
         self.assertEqual(heights_diff,1)
 
-        # # TestCase12: [a,b,c,x] + [A,B,C,D,E,F,G,H] = [a,b,c,x,A,B,C,D,E,F,G,H]
-        # tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
-        # tree2 = createTreeFromList(["x1",None,"x2",None,None,None,"x3",None, None, None,None, None,None, None])
+        # # TestCase13: (opposite of Testcase12)  [A,B,C,D,E,F,G,H] + [a,b,c,x]= [A,B,C,D,E,F,G,H,a,b,c,x]
+        # tree1 = createTreeFromList(["F","D","H","B","E","G",None,"A","C"]+[None]*6) # [A,B,C,D,E,F,G,H]
+        # tree2 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         # heights_diff = tree1.concat(tree2)
         # self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
         # self.assertEqual(heights_diff,1)
 
 
         # two types of rotations
+
+
+        # TODO:
+        # left rebalance
+        # for each test, add a test or the same trees in opposite order
+        # many rotations rebalance
 
         ###########################
         # Case 3 - Large lists
@@ -744,6 +840,23 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(compareTrees(tree1, createTreeFromList(lst)), True)
         self.assertEqual(heights_diff,0)
 
+        # TODO:
+        # concat a 10-leveled tree (~2047 nodes) with 20-leveled tree (~1048576 nodes)
+
+
+        ####################################
+        # Case 4 - Different Maxinum States
+        ####################################
+
+        # TODO:
+        # max is a leaf
+        # max is not a leaf
+        # max deletion will cause a single rotation
+        # max deletion will cause multiple rotations
+
+
+
+
         tree1 = createTreeFromList(['z','x','w','y',None,None,None])
         tree2 = createTreeFromList(['a','b','c'])
         tree1.concat(tree2)
@@ -758,6 +871,54 @@ class TestMavnatProject1(unittest.TestCase):
 
 
     def testSplit(self):
+
+        ########################
+        # Case 1: Edge Cases:
+        ########################
+        # Testcase1: [a], 0 - expceted: [[],a,[]]
+        # Testcase2: [a,b], 0 - expected: [[], a, [b]]
+        # Testcase3: [a,b], 0 - expected: [[a],b,[]]
+        # Testcase4: [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o], 7 - expected: [[a,b,c,d,e,f,g], h, [i,j,k,l,m,n,o]]
+        # Testcase5: [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o], 14 - expected: [[a,b,c,d,e,f,g,h,i,j,k,l,m,n], o, []]
+        # Testcase6: [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o], 0 - expected: [[], a, [b,c,d,e,f,g,h,i,j,k,l,m,n,o]]
+
+        #############################
+        # Case 2: Splitter Node State
+        #############################
+        # Testcase1: splitter is a leaf
+        # Testcase2: splitter is an inner node
+        # Testcase3: splitter is the root
+        # Testcase4: splitter has only left child
+        # Testcase5: splitter has only right child
+
+
+        ####################################
+        # Case 3: Different Joins Scenarios
+        ####################################
+        # Testcase1: High number of Joins
+        # Testcase2: only left Joins
+        # Testcase3: only right Joins
+        # Testcase4: join causes long rebalance (high number of rotations)
+
+
+        ####################################
+        # Case 4: Random
+        ####################################
+        # Testcase1: splitter index is randomly chosen
+
+
+        ####################################
+        # Case 5: Chain of Splits
+        ####################################
+        # Testcase1: create a list and split it by half, then split each result by half and so on
+        # Testcase2: create a list and split it by 0, then split the larger result by 0 and so on
+        # Testcase3: create a list and split it by len -1, then split the smaller result by len and so on
+
+
+        ######################
+        # Case 6: General
+        ######################
+
         tree = createTreeFromList(['a','b','c',None,'d','e','f',None,None,None,None,None,'g',None,None])
         result = tree.split(4)
         self.assertEqual(result[1], 'g')
@@ -768,6 +929,103 @@ class TestMavnatProject1(unittest.TestCase):
 
 
     def testSearch(self):
+        ####################################
+        # Case 1: Edge Cases
+        ####################################
+
+        # Testcase1: [], "" - expected: -1
+        tree = createTreeFromList([])
+        self.assertEqual(tree.search(""), -1)
+
+        # Testcase2: [a], "a" - expected: 0
+        tree = createTreeFromList(["a"])
+        self.assertEqual(tree.search("a"), 0)
+
+        # Testcase3: [a], "b" - expected: -1
+        tree = createTreeFromList(["a"])
+        self.assertEqual(tree.search("b"),-1)
+
+
+        ####################################
+        # Case 2: Search all nodes
+        ####################################
+        # Testcase4: [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o], {a,b,c,d,e,f,g,h,i,j,k,l,m,n,o} - expected: {0,1,2,3,...,14}
+        tree = createTreeFromList(["h","d","l","b","f","j","n","a","c","e","g","i","k","m","o"])
+        self.assertEqual(tree.search("a"),0)
+        self.assertEqual(tree.search("b"),1)
+        self.assertEqual(tree.search("c"),2)
+        self.assertEqual(tree.search("d"),3)
+        self.assertEqual(tree.search("e"),4)
+        self.assertEqual(tree.search("f"),5)
+        self.assertEqual(tree.search("g"),6)
+        self.assertEqual(tree.search("h"),7)
+        self.assertEqual(tree.search("i"),8)
+        self.assertEqual(tree.search("j"),9)
+        self.assertEqual(tree.search("k"),10)
+        self.assertEqual(tree.search("l"),11)
+        self.assertEqual(tree.search("m"),12)
+        self.assertEqual(tree.search("n"),13)
+        self.assertEqual(tree.search("o"),14)
+        self.assertEqual(tree.search("x"),-1)
+
+
+
+        ####################################
+        # Case 3: Search special node
+        ####################################
+        # Testcase1: search root
+        tree1 =createTreeFromList(['f','b','h','a','d','g','i', None, None, 'c', 'e' ,None, None, None, None])
+        self.assertEqual(tree1.search("f"),5)
+        # Testcase2: search leaf
+        self.assertEqual(tree1.search("c"),2)
+        # Testcase3: search inner node
+        self.assertEqual(tree1.search("d"),3)
+        # Testcase4: search a node with only left son
+        tree1 =createTreeFromList(['f','b','h','a','d','g','i', None, None, 'c', None ,None, None, None, None])
+        self.assertEqual(tree1.search("d"), 3)
+        # Testcase5: search a node with only right son
+        tree1 =createTreeFromList(['f','b','h','a','d','g','i', None, None, None, 'e' ,None, None, None, None])
+        self.assertEqual(tree1.search("d"), 2)
+        # Testcase6: search lastitem
+        self.assertEqual(tree1.search("a"),0)
+        # Testcase7: search firstitem
+        self.assertEqual(tree1.search("i"),7)
+        # Testcase8: Verify None is not in the list
+        self.assertEqual(tree1.search(None),-1)
+
+
+
+
+        ################################################################################
+        # Case 4: Search in a large tree / search when value has multiple apearences 
+        ################################################################################
+        # List = [a]*63 + [x] + [b]*63 + [y] + [c]*63 + [z] + [d]*63
+        # search "a" - expected: 0
+        # search "b" - expected: 100
+        # search "c" - expected: 200
+        # search "d" - expected: 300
+        # search "e" - expected: 400
+        # search "d" - expected: 500
+        tree = createTreeFromList(["y","x","z","a","b","c","d"]+["a"]*2+["b"]*2+["c"]*2+["d"]*2+["a"]*4+["b"]*4+["c"]*4+["d"]*4+["a"]*8+["b"]*8+["c"]*8+["d"]*8+["a"]*16+["b"]*16+["c"]*16+["d"]*16+["a"]*32+["b"]*32+["c"]*32+["d"]*32)
+        self.assertEqual(tree.search("a"), 0)
+        self.assertEqual(tree.search("b"),64)
+        self.assertEqual(tree.search("c"),128)
+        self.assertEqual(tree.search("d"),192)
+        self.assertEqual(tree.search("x"), 63)
+        self.assertEqual(tree.search("y"), 127)
+        self.assertEqual(tree.search("z"), 191)
+        # Testcase2: [a,a,a], "a" - expected: 0
+        tree = createTreeFromList(["a","a","a"])
+        self.assertEqual(tree.search("a"), 0)
+        # Testcase3: [b,a,a], "a" - expected: 1
+        tree = createTreeFromList(["a","b","a"])
+        self.assertEqual(tree.search("a"),1)
+        # Testcase4: [a,b,c,d,e,e,f], "e" - expected: 4
+        tree = createTreeFromList(["d","b","e","a","c","e","f"])
+        self.assertEqual(tree.search("e"),4)
+
+
+
         tree1 = createTreeFromList(['x','y','z','p','w','u','v',None, None,'q',None, None, None, None, None])
         self.assertEqual(tree1.search('p'),0)
         self.assertEqual(tree1.search('y'),1)
