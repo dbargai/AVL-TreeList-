@@ -361,25 +361,7 @@ class AVLTreeList(object):
 		node.setHeight(0)
 		node.size+=1
 		return None
-	
-	"""creates a root when the tree is empty
 
-	@type val: any object
-	@pre: 
-	@param val: the value of the new node we create  
-	@rtype: None
-	@returns: None
-	"""
-	def createRoot(self,val):
-			self.root.setValue(val)
-			self.root.setHeight(0)
-			self.root.setSize(1)
-			self.root.setLeft(AVLNode(None))
-			self.root.left.setParent(self.root)
-			self.root.setRight(AVLNode(None))
-			self.root.right.setParent(self.root)
-			self.firstitem=val
-			self.lastitem=val
 
 	"""deletes a node and turn him to "virtual Node"
 
@@ -427,7 +409,7 @@ class AVLTreeList(object):
 
 	def insert(self,i,val):
 		if self.empty(): 
-			self.createRoot(val)
+			self.createNode(self.root,val) #True means this is a root
 			self.firstitem=self.root
 			self.lastitem=self.root
 			return 0
@@ -437,8 +419,8 @@ class AVLTreeList(object):
 			self.createNode(node,val)
 			self.lastitem=node
 		else:
-			curr=self.retrieve_node(i)
-			if not curr.getLeft().isRealNode():
+			curr=self.retrieve_node(i) 
+			if not curr.getLeft().isRealNode(): 
 				node=curr.getLeft()
 				self.createNode(node,val)
 			else:
@@ -462,7 +444,7 @@ class AVLTreeList(object):
 		cnt_rotations=0
 		first=False
 		last=False
-		if self.length()!=1:
+		if self.length()!=1:  #check if deleted node is first and/or last
 			last=True if i==self.length()-1 else False
 			first=True if i==0 else False
 		node= self.retrieve_node(i)
