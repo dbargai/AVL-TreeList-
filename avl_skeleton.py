@@ -293,9 +293,9 @@ class AVLTreeList(object):
 	@type last: AVLNode
 	@param last: the last item of the list
 	"""
+
 	def setLastItem(self, last):
 		self.lastitem = last
-
 
 	"""returns whether the list is empty
 
@@ -550,13 +550,13 @@ class AVLTreeList(object):
 			self.lastitem=right_lst.lastitem
 		
 		if self.getRoot().getHeight() > right_lst.getRoot().getHeight():
-			node=AVLTreeList.findMaximalNodeByHeight(self.getRoot(), right_lst.getRoot().getHeight())
+			node=self.findMaximalNodeByHeight(right_lst.getRoot().getHeight())
 			self.concat_redirect(mid, node, right_lst.getRoot(), node.getParent(), self.getRoot(), 'R')
 		elif self.getRoot().getHeight() < right_lst.getRoot().getHeight():
-			node=AVLTreeList.findMinimalNodeByHeight(right_lst.getRoot(),  self.getRoot().getHeight())
+			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
 			self.concat_redirect(mid, self.getRoot(), node, node.getParent(), right_lst.getRoot(), 'L')
 		else:
-			node=AVLTreeList.findMinimalNodeByHeight(right_lst.getRoot(), self.getRoot().getHeight())
+			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
 			self.concat_redirect(mid, self.getRoot(), node, None, mid, None)
 		self.rebalance(mid.getParent())
 
@@ -576,8 +576,7 @@ class AVLTreeList(object):
 		right_tree = AVLTreeList()
 		right_tree.root = right_root
 		left_tree.join(mid, right_tree)
-		return left_tree.getRoot()
-
+		return left_tree
 
 	"""splits the list at the i'th index, Time Complexity: O(logn)
 
@@ -588,50 +587,46 @@ class AVLTreeList(object):
 	@returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
+
 	def split(self, i):
+		# Create 2 instances of AVLTreeList which will be the lists after the split
 		left_tree = AVLTreeList()
 		right_tree = AVLTreeList()
 
+		# Find splitter node
 		splitter = self.retrieve_node(i)
-		next_son = splitter
-		next_parent = next_son.getParent() # keep original parent 
-										   # in case relaitions will change during iteration
+		
+		next_parent = splitter.getParent() # keep original parent 
+										   # in case pointers will change during join
 
-		last_left = next_son.getLeft() # last root of the left list
-		last_right = next_son.getRight() # last root of the right list
+		# Set roots:
+		left_tree.setRoot(splitter.getLeft())
+		right_tree.setRoot(splitter.getRight())
 
+		isLeft = splitter.isLeftSon()
 
 		while next_parent != None:
-			next_parent_to_set = next_parent.getParent()
-			set_as_left = next_parent.isLeftSon()
-			if next_son.isLeftSon():
-				last_right = AVLTreeList.joinByRoot(last_right, next_parent, next_parent.getRight())
-				last_right.setParent(next_parent_to_set)
-				next_son = last_right
+			next_parent_to_set = next_parent.getParent() # keep next parent now in case 
+														 # pointers will change during join
+			if isLeft:
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				right_tree = AVLTreeList.joinByRoot(right_tree.getRoot(), next_parent, next_parent.getRight())
 			else:
-				last_left = AVLTreeList.joinByRoot(next_parent.getLeft(), next_parent, last_left)
-				last_left.setParent(next_parent_to_set)
-				next_son = last_left
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				left_tree = AVLTreeList.joinByRoot(next_parent.getLeft(), next_parent, left_tree.getRoot())
+			next_parent = next_parent_to_set
 
-			# connect joined tree to the next parent (in case tree structure has changed)
-			if next_parent_to_set!=None:
-				if set_as_left and next_parent_to_set != None:
-					next_parent_to_set.setLeft(last_left)
-				else:
-					next_parent_to_set.setRight(last_right)
-			
-			# update next_parent
-			next_parent= next_parent_to_set
-		left_tree.firstitem = self.firstitem
-		left_tree.lastitem = AVLTreeList.findMaximalNodeByHeight(last_left, 0)
-		right_tree.firstitem = AVLTreeList.findMinimalNodeByHeight(last_right, 0)
-		right_tree.lastitem = self.lastitem
-		
-		last_left.setParent(None)
-		last_right.setParent(None)
+		# set roots parents to None:	
+		left_tree.getRoot().setParent(None) 
+		right_tree.getRoot().setParent(None)
 
-		left_tree.root = last_left
-		right_tree.root = last_right
+		# set lastitems, firstitems, add O(logn) - does not ruin complexity
+		left_tree.firstitem = self.firstitem if i!=0 else left_tree.findMinimalNodeByHeight(0)
+		left_tree.lastitem = left_tree.findMaximalNodeByHeight(0)
+		right_tree.firstitem = right_tree.findMinimalNodeByHeight(0)
+		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
 
 		return [left_tree, splitter.getValue() ,right_tree]
 
@@ -704,6 +699,12 @@ class AVLTreeList(object):
 			root=root.getLeft()
 		return root
 
+	def findMinimalNodeByHeight(self, h):
+		node = self.getRoot()
+		while node.getHeight()>h:
+			node = node.getLeft()
+		return node
+
 	"""returns maximal-index node with height<=h
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
@@ -715,6 +716,11 @@ class AVLTreeList(object):
 			root=root.right
 		return root
 
+	def findMaximalNodeByHeight(self,h):
+		node = self.getRoot()
+		while node.height>h:
+			node = node.getRight()
+		return node
 
 	"""set sons and parents fields for concat (O(1))
 	@rtype: None
