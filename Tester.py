@@ -1,8 +1,8 @@
 import unittest
-from venv import create
 import avl_skeleton as AVLTreeList
 import math
-import random  
+import random
+
 
 def printTreefinal(tree):
     out = ""
@@ -325,7 +325,40 @@ class TestMavnatProject1(unittest.TestCase):
 
         tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
         self.assertEqual(tree1, False)
-    
+
+
+
+    def testisAVL(self):
+        tree=AVLTreeList.AVLTreeList()
+        tree.insert(0,0)
+        tree.insert(1,1)
+        for i in range(2,10):
+            last=tree.lastitem
+            tree.createNode(last.right,i)
+            tree.lastitem=tree.lastitem.right
+            node=tree.root
+            while(node.right!=None):
+                node.setHeight(node.getHeight()+1)
+                node.setSize(node.getSize()+1)
+                node=node.right
+            self.assertEqual(False,isAVL(tree.root))
+        del tree
+        tree=AVLTreeList.AVLTreeList()
+        tree.insert(0,9)
+        tree.insert(0,8)
+        for i in range(7,-1,-1):
+            first=tree.firstitem
+            tree.createNode(first.left,i)
+            tree.firstitem=tree.firstitem.left
+            node=tree.root
+            while(node.left!=None):
+                node.setHeight(node.getHeight()+1)
+                node.setSize(node.getSize()+1)
+                node=node.left
+            self.assertEqual(False,isAVL(tree.root))
+
+        
+
     def testInsert_Rotations(self):
         tree1=AVLTreeList.AVLTreeList()
         tree2=AVLTreeList.AVLTreeList()
@@ -449,10 +482,15 @@ class TestMavnatProject1(unittest.TestCase):
             self.assertEqual(True,tree1.getRoot().getHeight()==-1)                
             self.assertEqual(True,tree1.getRoot().getValue()==None)                
             self.assertEqual(True,tree1.empty()==True) 
-                       
+         #Testcase1: Delete node with successor that has children
+        tree=createTreeFromList([5,2,7,1,None,None,8])
+        tree.delete(2)
+        self.assertEqual(tree.getRoot().getValue(),7) 
+ 
+
+    
 
     def testrandomTrees(self):
-        random.seed(10)
         tree=AVLTreeList.AVLTreeList()
         L=[]
         for j in range(50):
@@ -545,18 +583,30 @@ class TestMavnatProject1(unittest.TestCase):
         tree = AVLTreeList.AVLTreeList()
         for i in range(5):
             tree.insert(i,i) #[0,1,2,3,4]
-        print(printTreefinal(tree))
         splitted=tree.split(2) # [0,1],2,[3,4]
         left=splitted[0]
         right=splitted[2]
-        print(printTreefinal(splitted[0]))
-        print(printTreefinal(splitted[2]))
         print((splitted[1]))
         x=1
         
 
 
-        
+    def testLargeTree(self):
+        #Test case 1 Large tree built from inserts
+        tree= AVLTreeList.AVLTreeList()
+        for i in range(2**15):
+            tree.insert(i,i)
+        L=[i for i in range(2**15)]
+        self.assertEqual(L,tree.listToArray())
+        self.assertEqual(L[0],tree.first())
+        self.assertEqual(L[len(L)-1],tree.last())
+        h=tree.getRoot().getHeight()
+        self.assertEqual(h<15,h>17)
+
+
+
+
+
 
 
     def testMediumTreesOperations(self):

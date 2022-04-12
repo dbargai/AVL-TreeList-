@@ -4,18 +4,7 @@
 #id2      - 208992883
 #name2    - Or Shemesh 
 
-
-
-"""A class represnting a node in an AVL tree"""
-
-from operator import attrgetter
-from platform import node
-from tkinter import N
-from tkinter.messagebox import NO
-from turtle import left
-import math
-import Tester 
-
+ 
 
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields. 
@@ -304,7 +293,8 @@ class AVLTreeList(object):
 	@type last: AVLNode
 	@param last: the last item of the list
 	"""
-	def getLastItem(self, last):
+
+	def setLastItem(self, last):
 		self.lastitem = last
 
 	"""returns whether the list is empty
@@ -427,8 +417,7 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 
-	"""inserts val using recursion
-
+	"""inserts val using recursion, Time Complexity: O(logn)
 	@type i: int
 	@pre: 0 <= i <= self.length()
 	@param i: The intended index in the list to which we insert val
@@ -462,7 +451,7 @@ class AVLTreeList(object):
 		return self.rebalance(node)
 
 	
-	"""deletes the i'th item in the list
+	"""deletes the i'th item in the list, Time Complexity: O(logn)
 
 	@type i: int
 	@pre: 0 <= i < self.length()
@@ -520,7 +509,7 @@ class AVLTreeList(object):
 	def last(self):
 		return self.lastitem.getValue()
 
-	"""returns an array representing list 
+	"""returns an array representing list, Time Complexity: O(n)
 
 	@rtype: list
 	@returns: a list of strings representing the data structure
@@ -669,12 +658,11 @@ class AVLTreeList(object):
 		self.join(middle, lst)
 		return heights_diff
 
-	"""rebalancing the tree from a given node to the root
+	"""rebalancing the tree from a given node to the root, Time Complexity: O(logn)
 	@rtype: int
 	@returns: a counter of the number of rotations performed
 	"""
 	def rebalance(self, start_node):
-		# Tester.printTreefinal(self)
 		cnt=0
 		while (start_node !=None):
 			if abs(start_node.getBF())==2:
@@ -683,19 +671,13 @@ class AVLTreeList(object):
 						start_node=self.rotateRightThenLeft(start_node, start_node.getRight(), start_node.getRight().getLeft())
 						cnt+=2
 					else:
-						#if self.getright().getBF() not in [0,-1]:
-						#	print("Impossible BF")
 						start_node=self.rotateLeft(start_node, start_node.getRight())
 						cnt+=1
 				else: #BF is +2
-					#if start_node.getBF()!=2:
-					#	print("Impossible BF")
 					if start_node.getLeft().getBF()==-1:
 						start_node=self.rotateLeftThenRight(start_node, start_node.getLeft(), start_node.getLeft().getRight())
 						cnt+=2
 					else:
-						#if self.getright().getBF() not in [0,1]:
-						#	print("Impossible BF")
 						start_node=self.rotateRight(start_node, start_node.getLeft())
 						cnt+=1
 			else:
@@ -938,7 +920,7 @@ class AVLTreeList(object):
 		if node3!=None:
 			node3.setHeight((1+max(node3.left.getHeight(),node3.right.getHeight())))
 
-	"""finds predecessor of a given node
+	"""finds predecessor of a given node, Time Complexity: O(logn)
 	@pre: self.isRealNode(node.getLeft()) 
 	@type: AVLNode
 	@rtype: AVLNode
@@ -956,7 +938,7 @@ class AVLTreeList(object):
 			parent=node.getParent()
 		return parent
 	
-	"""finds successor of a given node
+	"""finds successor of a given node, Time Complexity: O(logn)
 	Time Complexity (worst case): O(logn) - going downward only or upward only
 	@pre: self.isRealNode(node.getR())
 	@type: AVLNode
