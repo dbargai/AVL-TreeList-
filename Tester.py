@@ -1057,10 +1057,34 @@ class TestMavnatProject1(unittest.TestCase):
         # Case 2: Splitter Node State
         #############################
         # Testcase1: splitter is a leaf
+        tree = createTreeFromList(["d","b","f","a","c","e","g"])
+        result = tree.split(2)
+        self.assertEqual(compareTrees(result[0], createTreeFromList(["a",None,"b"])),True)
+        self.assertEqual(result[1],"c")
+        self.assertEqual(compareTrees(result[2], createTreeFromList(["f","e","g","d",None,None,None])),True)
+
         # Testcase2: splitter is an inner node
+        tree = createTreeFromList(["d","b","g","a","c","f","h"]+[None]*4+["e"]+[None]*2 +["i"])
+        result = tree.split(5)
+        self.assertEqual(compareTrees(result[0], createTreeFromList(["b","a","d",None,None,"c","e"])),True)
+        self.assertEqual(result[1], "f")
+        self.assertEqual(compareTrees(result[2], createTreeFromList(["h","g","i"])),True)
+
         # Testcase3: splitter is the root
-        # Testcase4: splitter has only left child
+        tree = createTreeFromList(["d","b","g","a","c","f","h"]+[None]*4+["e"]+[None]*2 +["i"])
+        result = tree.split(3)
+        self.assertEqual(compareTrees(result[0], createTreeFromList(["b","a","c"])),True)
+        self.assertEqual(result[1], "d")
+        self.assertEqual(compareTrees(result[2], createTreeFromList(["g","f","h","e",None,None,"i"])),True)
+
+        # Testcase4: splitter has only left child (Tested in Testcase2)
+
         # Testcase5: splitter has only right child
+        tree = createTreeFromList(["d","b","g","a","c","f","h"]+[None]*4+["e"]+[None]*2 +["i"])
+        result = tree.split(7)
+        self.assertEqual(compareTrees(result[0], createTreeFromList(["d","b","f","a","c","e","g"])),True)
+        self.assertEqual(result[1], "h")
+        self.assertEqual(compareTrees(result[2], createTreeFromList(["i"])),True)
 
 
         ####################################
