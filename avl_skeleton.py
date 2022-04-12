@@ -590,7 +590,6 @@ class AVLTreeList(object):
 		left_tree.join(mid, right_tree)
 		return left_tree
 
-
 	"""splits the list at the i'th index
 
 	@type i: int
