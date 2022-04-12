@@ -395,6 +395,14 @@ class AVLTreeList(object):
 		node.setHeight(-1)
 		node.setSize(0)
 		return None
+	
+	"""deletes a middle node and "skip" over him
+
+	@type Node: AVLNode
+	@pre: Node has one child
+	@rtype: None
+	@returns: None
+	"""
 
 	def deleteMiddleNode(self,node):
 		parent=node.getParent()
@@ -406,7 +414,7 @@ class AVLTreeList(object):
 			node.right.setParent(parent)
 		return None
 
-	"""inserts val at position i in the list  ## original contract
+	"""inserts val at position i in the list, Time Complexity: O(logn)
 
 	@type i: int
 	@pre: 0 <= i <= self.length()
@@ -417,15 +425,6 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 
-	"""inserts val using recursion, Time Complexity: O(logn)
-	@type i: int
-	@pre: 0 <= i <= self.length()
-	@param i: The intended index in the list to which we insert val
-	@type val: str
-	@param val: the value we insert
-	@rtype: list
-	@returns: the number of rebalancing operation due to AVL rebalancing
-	"""
 	def insert(self,i,val):
 		if self.empty(): 
 			self.createRoot(val)
@@ -580,7 +579,7 @@ class AVLTreeList(object):
 		return left_tree.getRoot()
 
 
-	"""splits the list at the i'th index
+	"""splits the list at the i'th index, Time Complexity: O(logn)
 
 	@type i: int
 	@pre: 0 <= i < self.length()
@@ -637,7 +636,7 @@ class AVLTreeList(object):
 		return [left_tree, splitter.getValue() ,right_tree]
 
 
-	"""concatenates lst to self
+	"""concatenates lst to self, Time Complexity: O(logn)
 
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
@@ -738,7 +737,7 @@ class AVLTreeList(object):
 		self.root = newRoot
 
 
-	"""searches for a *value* in the list
+	"""searches for a *value* in the list, Time Complexity: O(n)
 
 	@type val: str
 	@param val: a value to be searched
