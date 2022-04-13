@@ -857,7 +857,7 @@ class TestMavnatProject1(unittest.TestCase):
         # Case 2 - Rebalance cases:
         ###########################
 
-        # Testcase10: (one right rebalance nedded) [a,b,c,x] + [A,B,C,D,E] = [a,b,c,x,A,B,C,D,E]
+        # Testcase10: (one right rebalance needded) [a,b,c,x] + [A,B,C,D,E] = [a,b,c,x,A,B,C,D,E]
         tree1 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
         tree2 = createTreeFromList(["D","B","E","A","C",None, None]) # [A,B,C,D,E]
         heights_diff = tree1.concat(tree2)
@@ -879,21 +879,31 @@ class TestMavnatProject1(unittest.TestCase):
         self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
         self.assertEqual(heights_diff,1)
 
-        # # TestCase13: (opposite of Testcase12)  [A,B,C,D,E,F,G,H] + [a,b,c,x]= [A,B,C,D,E,F,G,H,a,b,c,x]
-        # tree1 = createTreeFromList(["F","D","H","B","E","G",None,"A","C"]+[None]*6) # [A,B,C,D,E,F,G,H]
-        # tree2 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
-        # heights_diff = tree1.concat(tree2)
-        # self.assertEqual(compareTrees(tree1, createTreeFromList(["D","x","F","b","B","E","H","a","c","A","C",None,None,"G",None])),True)
-        # self.assertEqual(heights_diff,1)
+        # TestCase13: (opposite of Testcase12)  [A,B,C,D,E,F,G,H] + [a,b,c,x]= [A,B,C,D,E,F,G,H,a,b,c,x]
+        tree1 = createTreeFromList(["F","D","H","B","E","G",None,"A","C"]+[None]*6) # [A,B,C,D,E,F,G,H]
+        tree2 = createTreeFromList(["b","a","c",None, None,None,"x"]) # [a,b,c,x]
+        heights_diff = tree1.concat(tree2)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["H","D","b","B","F","a","c","A","C","E","G",None,None,None,"x"])),True)
+        self.assertEqual(heights_diff,1)
 
 
-        # two types of rotations
+        # Testcase14: (one left rebalance needded) - [A,B,C,D,E] + [a,b,c] = [A,B,C,D,E,a,b,c]
+        tree1 = createTreeFromList(["B","A","D",None, None, "C","E"])
+        tree2 = createTreeFromList(["b","a","c"])
+        heights_diff = tree1.concat(tree2)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["E","B","b","A","D","a","c",None,None,"C"]+[None]*5)),True)
+        self.assertEqual(heights_diff, 1)
+
+        # Testcase15: opposite of Testcase14: 
+        tree1 = createTreeFromList(["b","a","c"])
+        tree2 = createTreeFromList(["B","A","D",None, None, "C","E"])
+        heights_diff = tree1.concat(tree2)
+        self.assertEqual(compareTrees(tree1, createTreeFromList(["B","c","D","b","A","C","E","a"]+[None]*7)),True)
+        self.assertEqual(heights_diff,1)
 
 
         # TODO:
-        # left rebalance
-        # for each test, add a test or the same trees in opposite order
-        # many rotations rebalance
+        # many rotations rebalance - is it possible?
 
         ###########################
         # Case 3 - Large lists
@@ -913,7 +923,20 @@ class TestMavnatProject1(unittest.TestCase):
 
         # TODO:
         # concat a 10-leveled tree (~2047 nodes) with 20-leveled tree (~1048576 nodes)
-
+        lst1 = ["Y","X","Z"]
+        for i in range(15): #20 was too much
+            lst1 += ["x1"]*(2**i) + ["x2"]*(2**i) + ["x3"]*(2**i) + ["x4"]*(2**i)
+        
+        lst2 = ["B","A","C"]
+        for j in range(5):
+            lst2 += ["a1"]*(2**j) + ["a2"]*(2**j) + ["a3"]*(2**j) + ["a4"]*(2**j)
+        
+        tree1 = createTreeFromList(lst1)
+        tree2 = createTreeFromList(lst2)
+        exp_lst = tree1.listToArray() + tree2.listToArray()
+        heights_diff = tree1.concat(tree2)
+        self.assertEqual(exp_lst, tree1.listToArray())
+        self.assertEqual(heights_diff, 10)
 
         ####################################
         # Case 4 - Different Maxinum States
@@ -1090,24 +1113,51 @@ class TestMavnatProject1(unittest.TestCase):
         ####################################
         # Case 3: Different Joins Scenarios
         ####################################
-        # Testcase1: High number of Joins
-        # Testcase2: only left Joins
-        # Testcase3: only right Joins
-        # Testcase4: join causes long rebalance (high number of rotations)
+        # Testcase1: High number of Joins  - tested in Case 6
+        # Testcase2: only left Joins - tested any time the max is the splitter
+        # Testcase3: only right Joins - tested any time the min is the splitter
+        # Testcase4: join causes long rebalance (high number of rotations) - is it possible?
 
 
         ####################################
         # Case 4: Random
         ####################################
         # Testcase1: splitter index is randomly chosen
+        for k in range (100):
+            lst = ["B","A","C"]
+            for i in range (10):
+                lst += ["x1"]*(2**i) + ["x2"]*(2**i) + ["x3"]*(2**i) + ["x4"]*(2**i)
+            tree = createTreeFromList(lst)
+            tree_list = tree.listToArray()
+            i = random.randint(0,tree.length()-1)
+            result = tree.split(i)
+            self.assertEqual(tree_list[:i], result[0].listToArray())
+            self.assertEqual(tree_list[i], result[1])
+            self.assertEqual(tree_list[i+1:len(tree_list)], result[2].listToArray())
+            self.assertEqual(isAVL(result[0].getRoot()), True)
+            self.assertEqual(isAVL(result[2].getRoot()),True)
+
 
 
         ####################################
         # Case 5: Chain of Splits
         ####################################
         # Testcase1: create a list and split it by half, then split each result by half and so on
-        # Testcase2: create a list and split it by 0, then split the larger result by 0 and so on
-        # Testcase3: create a list and split it by len -1, then split the smaller result by len and so on
+        lst = ["B","A","C"]
+        for i in range (10):
+            lst += ["x1"]*(2**i) + ["x2"]*(2**i) + ["x3"]*(2**i) + ["x4"]*(2**i)
+        tree = createTreeFromList(lst)
+        while tree.length()>0:
+            #printTreefinal(tree)
+            tree_list = tree.listToArray()
+            k = tree.length()//2
+            result = tree.split(k)
+            self.assertEqual(result[0].listToArray(), tree_list[:k])
+            self.assertEqual(result[1], tree_list[k])
+            self.assertEqual(result[2].listToArray(), tree_list[k+1:])
+            self.assertEqual(isAVL(result[0].getRoot()),True)
+            self.assertEqual(isAVL(result[2].getRoot()),True)
+            tree = result[0]
 
 
         ####################################
