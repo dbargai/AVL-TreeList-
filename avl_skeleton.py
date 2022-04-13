@@ -303,9 +303,9 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		if self.length()==0:
-			return True
-		return False	
+		return True if self.length()==0 else False
+
+
 
 
 	"""retrieves the value of the i'th item in the list
@@ -409,7 +409,7 @@ class AVLTreeList(object):
 
 	def insert(self,i,val):
 		if self.empty(): 
-			self.createNode(self.root,val) #True means this is a root
+			self.createNode(self.root,val) 
 			self.firstitem=self.root
 			self.lastitem=self.root
 			return 0
