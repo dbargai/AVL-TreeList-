@@ -12,6 +12,7 @@ class AVLNode(object):
 	@type value: str
 	@param value: data of your node
 	@$height=-1 @implies this is a virtual node
+	@Time Complexity: O(1)
 	"""
 	def __init__(self, value):
 		self.value = value
@@ -20,21 +21,6 @@ class AVLNode(object):
 		self.parent = None
 		self.height = -1
 		self.size = 0
-		
-	
-	"""Set all node fields by given
-	@type value: str
-	@type left, right, parent: AVLNode
-	@type height, size: int
-	@param value: data of your node
-	"""
-	def setFields(self, value, left, right, parent, height, size):
-		self.value = value
-		self.left = left
-		self.right = right
-		self.parent = parent
-		self.height = height
-		self.size = size
 
 
 	##################################

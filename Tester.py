@@ -4,6 +4,20 @@ import math
 import random
 
 
+"""Set all node fields by given
+	@type value: str
+	@type left, right, parent: AVLNode
+	@type height, size: int
+	@param value: data of your node
+	"""
+def setFields(node, value, left, right, parent, height, size):
+    node.value = value
+    node.left = left
+    node.right = right
+    node.parent = parent
+    node.height = height
+    node.size = size
+
 def printTreefinal(tree):
     out = ""
     for row in printree(tree.getRoot()):  # need printree.py file
@@ -177,7 +191,7 @@ def createTreeFromList_rec(lst, i, power):
     
     if nextIndex>=len(lst):
         node = AVLTreeList.AVLNode(None)
-        node.setFields(lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
+        setFields(node,lst[i], AVLTreeList.AVLNode(None), AVLTreeList.AVLNode(None), None, 0, 1)
         node.getLeft().setParent(node)
         node.getRight().setParent(node)
         return node
@@ -192,7 +206,7 @@ def createTreeFromList_rec(lst, i, power):
 
         else:
             node = AVLTreeList.AVLNode(lst[i])
-            node.setFields(lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
+            setFields(node, lst[i], left, right, None, max(left.getHeight(), right.getHeight()) +1, left.getSize()+right.getSize()+1)
             left.setParent(node)
             right.setParent(node)
             return node
