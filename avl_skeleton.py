@@ -1,4 +1,4 @@
-#username - complete info
+#username - dvirbargai
 #id1      - 208772715 
 #name1    - Dvir Bargai 
 #id2      - 208992883
@@ -303,9 +303,9 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		if self.length()==0:
-			return True
-		return False	
+		return True if self.length()==0 else False
+
+
 
 
 	"""retrieves the value of the i'th item in the list
@@ -361,25 +361,7 @@ class AVLTreeList(object):
 		node.setHeight(0)
 		node.size+=1
 		return None
-	
-	"""creates a root when the tree is empty
 
-	@type val: any object
-	@pre: 
-	@param val: the value of the new node we create  
-	@rtype: None
-	@returns: None
-	"""
-	def createRoot(self,val):
-			self.root.setValue(val)
-			self.root.setHeight(0)
-			self.root.setSize(1)
-			self.root.setLeft(AVLNode(None))
-			self.root.left.setParent(self.root)
-			self.root.setRight(AVLNode(None))
-			self.root.right.setParent(self.root)
-			self.firstitem=val
-			self.lastitem=val
 
 	"""deletes a node and turn him to "virtual Node"
 
@@ -395,6 +377,14 @@ class AVLTreeList(object):
 		node.setHeight(-1)
 		node.setSize(0)
 		return None
+	
+	"""deletes a middle node and "skip" over him
+
+	@type Node: AVLNode
+	@pre: Node has one child
+	@rtype: None
+	@returns: None
+	"""
 
 	def deleteMiddleNode(self,node):
 		parent=node.getParent()
@@ -406,7 +396,7 @@ class AVLTreeList(object):
 			node.right.setParent(parent)
 		return None
 
-	"""inserts val at position i in the list  ## original contract
+	"""inserts val at position i in the list, Time Complexity: O(logn)
 
 	@type i: int
 	@pre: 0 <= i <= self.length()
@@ -417,18 +407,9 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 
-	"""inserts val using recursion, Time Complexity: O(logn)
-	@type i: int
-	@pre: 0 <= i <= self.length()
-	@param i: The intended index in the list to which we insert val
-	@type val: str
-	@param val: the value we insert
-	@rtype: list
-	@returns: the number of rebalancing operation due to AVL rebalancing
-	"""
 	def insert(self,i,val):
 		if self.empty(): 
-			self.createRoot(val)
+			self.createNode(self.root,val) 
 			self.firstitem=self.root
 			self.lastitem=self.root
 			return 0
@@ -438,8 +419,8 @@ class AVLTreeList(object):
 			self.createNode(node,val)
 			self.lastitem=node
 		else:
-			curr=self.retrieve_node(i)
-			if not curr.getLeft().isRealNode():
+			curr=self.retrieve_node(i) 
+			if not curr.getLeft().isRealNode(): 
 				node=curr.getLeft()
 				self.createNode(node,val)
 			else:
@@ -463,7 +444,7 @@ class AVLTreeList(object):
 		cnt_rotations=0
 		first=False
 		last=False
-		if self.length()!=1:
+		if self.length()!=1:  #check if deleted node is first and/or last
 			last=True if i==self.length()-1 else False
 			first=True if i==0 else False
 		node= self.retrieve_node(i)
@@ -579,7 +560,7 @@ class AVLTreeList(object):
 		left_tree.join(mid, right_tree)
 		return left_tree
 
-	"""splits the list at the i'th index
+	"""splits the list at the i'th index, Time Complexity: O(logn)
 
 	@type i: int
 	@pre: 0 <= i < self.length()
@@ -632,7 +613,7 @@ class AVLTreeList(object):
 		return [left_tree, splitter.getValue() ,right_tree]
 
 
-	"""concatenates lst to self
+	"""concatenates lst to self, Time Complexity: O(logn)
 
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
@@ -744,7 +725,7 @@ class AVLTreeList(object):
 		self.root = newRoot
 
 
-	"""searches for a *value* in the list
+	"""searches for a *value* in the list, Time Complexity: O(n)
 
 	@type val: str
 	@param val: a value to be searched
