@@ -212,7 +212,7 @@ class AVLTreeList(object):
 		self.root = AVLNode(None)
 		self.firstitem= self.root
 		self.lastitem= self.root
-		# add your fields here
+		
 
 
 	###############################################
@@ -737,7 +737,7 @@ class AVLTreeList(object):
 	@pre: parent.left.height-parent.right.height==2
 	@param parent: the old parent which we need to rotate for balancing
 	@type leftSon: AVLNode
-	@pre: leftSon.left.height-leftSon.right.height==1
+	@pre: leftSon.left.height-leftSon.right.height==1 or ==0
 	@param parent: the old left son which we need to rotate for balancing
 	@rtype: AVLNode
 	@returns: The parent of the given nodes
@@ -864,7 +864,7 @@ class AVLTreeList(object):
 	"""calculates and sets the size of all given nodes by order
 
 	@rtype: None
-	@returns: the root, None if the list is empty
+	@returns: None
 	"""
 	def updateSize(self,node1,node2=None,node3=None):
 		node1.setSize(1+node1.getLeft().getSize()+node1.getRight().getSize())
@@ -876,7 +876,7 @@ class AVLTreeList(object):
 	"""calculates and sets the height of all given nodes by order
 
 	@rtype: None
-	@returns: the root, None if the list is empty
+	@returns: None
 	"""
 	def updateHeight(self,node1,node2=None,node3=None):
 		node1.setHeight((1+max(node1.getLeft().getHeight(),node1.getRight().getHeight())))
