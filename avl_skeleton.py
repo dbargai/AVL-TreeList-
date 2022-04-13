@@ -531,13 +531,15 @@ class AVLTreeList(object):
 		
 		if self.getRoot().getHeight() > right_lst.getRoot().getHeight():
 			node=self.findMaximalNodeByHeight(right_lst.getRoot().getHeight())
-			self.concat_redirect(mid, node, right_lst.getRoot(), node.getParent(), self.getRoot(), 'R')
+			self.link_nodes(mid, node, right_lst.getRoot(), node.getParent(), 'R')
 		elif self.getRoot().getHeight() < right_lst.getRoot().getHeight():
 			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(mid, self.getRoot(), node, node.getParent(), right_lst.getRoot(), 'L')
+			self.link_nodes(mid, self.getRoot(), node, node.getParent(), 'L')
+			self.setRoot(right_lst.getRoot())
 		else:
-			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(mid, self.getRoot(), node, None, mid, None)
+			node=right_lst.getRoot()
+			self.link_nodes(mid, self.getRoot(), node, None, None)
+			self.setRoot(mid)
 		self.rebalance(mid.getParent())
 
 
@@ -694,12 +696,14 @@ class AVLTreeList(object):
 			node = node.getRight()
 		return node
 
-	"""set sons and parents fields for concat (O(1))
+	"""set sons and parents fields for join
 	@rtype: None
-	@pre: $side in {'R', 'L'}
-	@type s: string
+	@pre: $side == 'R' or $side = 'L'
+	@post: $mid's sons are $left and $right and its parent is $parent
+	@Time Complexity: O(1)
 	"""
-	def concat_redirect(self, mid, left, right, parent , newRoot, side):
+	@staticmethod
+	def link_nodes(mid, left, right, parent, side):
 		mid.setLeft(left)
 		mid.getLeft().setParent(mid)
 		mid.setRight(right)
@@ -712,7 +716,6 @@ class AVLTreeList(object):
 				parent.setRight(mid)
 			else:
 				parent.setLeft(mid)
-		self.root = newRoot
 
 
 	"""searches for a *value* in the list, Time Complexity: O(n)
