@@ -540,23 +540,19 @@ class AVLTreeList(object):
 			self.concat_redirect(mid, self.getRoot(), node, None, mid, None)
 		self.rebalance(mid.getParent())
 
-	"""returns the root of a tree is a join of $left_root subtree and $right_root subtree 
-	   using $mid a connecting element
-	   @pre: left_root, mid, right_root are AVLNodes
-	   @post: left_root, mid and right_soot are concatenated into united tree
-	   method will create AVLTreeList from the given roots inorder to join them
-	   method let split make joins by just passing roots
+
+	"""returns a tree which its root is the given node
+	@rtype: AVLTreeList
+	@pre: node is AVLNode
+	@post: $node is the root of $tree
+	@post: $node.parent=None. Note that this means $node is "disconnected" from its old tree
 	"""
 	@staticmethod
-	def joinByRoot (left_root, mid, right_root):
-		left_root.setParent(None)
-		right_root.setParent(None)
-		left_tree = AVLTreeList()
-		left_tree.root = left_root
-		right_tree = AVLTreeList()
-		right_tree.root = right_root
-		left_tree.join(mid, right_tree)
-		return left_tree
+	def createTreeByRoot(node):
+		node.setParent(None)
+		tree = AVLTreeList()
+		tree.root = node
+		return tree
 
 	"""splits the list at the i'th index, Time Complexity: O(logn)
 
@@ -567,7 +563,6 @@ class AVLTreeList(object):
 	@returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
-
 	def split(self, i):
 		# Create 2 instances of AVLTreeList which will be the lists after the split
 		left_tree = AVLTreeList()
@@ -591,15 +586,23 @@ class AVLTreeList(object):
 			if isLeft:
 				isLeft = next_parent.isLeftSon() # update this before the join operation
 												 # join in case pointers will change during join
-				right_tree = AVLTreeList.joinByRoot(right_tree.getRoot(), next_parent, next_parent.getRight())
+				# create tree from parent's right son:
+				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
+				# join trees:
+				right_tree.join(next_parent, tmp_right)
 			else:
 				isLeft = next_parent.isLeftSon() # update this before the join operation
 												 # join in case pointers will change during join
-				left_tree = AVLTreeList.joinByRoot(next_parent.getLeft(), next_parent, left_tree.getRoot())
+				# create trees from parent's left son:
+				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
+				# join trees:
+				tmp_left.join(next_parent, left_tree)
+				# in this case update left_tree:
+				left_tree = tmp_left
 			next_parent = next_parent_to_set
 
 		# set roots parents to None:	
-		left_tree.getRoot().setParent(None) 
+		left_tree.getRoot().setParent(None)
 		right_tree.getRoot().setParent(None)
 
 		# set lastitems, firstitems, add O(logn) - does not ruin complexity
@@ -611,12 +614,13 @@ class AVLTreeList(object):
 		return [left_tree, splitter.getValue() ,right_tree]
 
 
-	"""concatenates lst to self, Time Complexity: O(logn)
+	"""concatenates lst to self, Time Complexity:
 
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
 	@rtype: int
 	@returns: the absolute value of the difference between the height of the AVL trees joined
+	@Time Complexity: O(logn)
 	"""
 	def concat(self, lst):			
 		heights_diff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
