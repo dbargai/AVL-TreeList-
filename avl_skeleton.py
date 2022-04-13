@@ -673,12 +673,6 @@ class AVLTreeList(object):
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	@staticmethod
-	def findMinimalNodeByHeight(root, h):
-		while root.getHeight()>h:
-			root=root.getLeft()
-		return root
-
 	def findMinimalNodeByHeight(self, h):
 		node = self.getRoot()
 		while node.getHeight()>h:
@@ -690,12 +684,6 @@ class AVLTreeList(object):
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	@staticmethod
-	def findMaximalNodeByHeight(root, h):
-		while root.height>h:
-			root=root.right
-		return root
-
 	def findMaximalNodeByHeight(self,h):
 		node = self.getRoot()
 		while node.height>h:
