@@ -29,6 +29,7 @@ class AVLNode(object):
 	"""returns the left child
 	@rtype: AVLNode
 	@returns: the left child of self, None if there is no left child
+	@Time Complexity: O(1)
 	"""
 	def getLeft(self):
 		return self.left
@@ -37,6 +38,7 @@ class AVLNode(object):
 
 	@rtype: AVLNode
 	@returns: the right child of self, None if there is no right child
+	@Time Complexity: O(1)
 	"""
 	def getRight(self):
 		return self.right
@@ -45,6 +47,7 @@ class AVLNode(object):
 
 	@rtype: AVLNode
 	@returns: the parent of self, None if there is no parent
+	@Time Complexity: O(1)
 	"""
 	def getParent(self):
 		return self.parent
@@ -53,6 +56,7 @@ class AVLNode(object):
 
 	@rtype: str
 	@returns: the value of self, None if the node is virtual
+	@Time Complexity: O(1)
 	"""
 	def getValue(self):
 		return self.value
@@ -61,6 +65,7 @@ class AVLNode(object):
 
 	@rtype: int
 	@returns: the height of self, -1 if the node is virtual
+	@Time Complexity: O(1)
 	"""
 	def getHeight(self):
 		a=self.height
@@ -70,6 +75,7 @@ class AVLNode(object):
 
 	@rtype: int
 	@returns: the size of self
+	@Time Complexity: O(1)
 	"""
 	def getSize(self):
 		return self.size
@@ -78,6 +84,7 @@ class AVLNode(object):
 		@rtype: int
 		@returns: the Balance Factor of self
 		@pre: self represent a "Real Node"
+		@Time Complexity: O(1)
 	"""	
 	def getBF(self):
 		return self.getLeft().getHeight() - self.getRight().getHeight()
@@ -86,6 +93,7 @@ class AVLNode(object):
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
+	@Time Complexity: O(1)
 	"""	
 	def isRealNode(self):
 		return self.left!=None or self.right!=None
@@ -98,6 +106,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setLeft(self, node):
 		self.left=node
@@ -107,6 +116,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setRight(self, node):
 		self.right=node
@@ -116,6 +126,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setParent(self, node):
 		self.parent=node
@@ -125,6 +136,7 @@ class AVLNode(object):
 
 	@type value: str
 	@param value: data
+	@Time Complexity: O(1)
 	"""
 	def setValue(self, value):
 		self.value=value
@@ -134,6 +146,7 @@ class AVLNode(object):
 
 	@type h: int
 	@param h: the height
+	@Time Complexity: O(1)
 	"""
 	def setHeight(self, h):
 		self.height=h
@@ -143,6 +156,7 @@ class AVLNode(object):
 
 	@type size: int
 	@param size: the size of the sub-tree 
+	@Time Complexity: O(1)
 	"""
 	def setSize(self, size):
 		self.size=size
@@ -156,6 +170,7 @@ class AVLNode(object):
 
 	@rtype: bool
 	@returns: True if self is a leaf node, False otherwise.
+	@Time Complexity: O(1)
 	"""
 	def isLeaf(self):
 		if self.left.isRealNode() or self.right.isRealNode():
@@ -165,6 +180,7 @@ class AVLNode(object):
 	"""returns whether self is has exactly one real son
 	@rtype: bool
 	@returns: True if self has exactly one real child, False otherwise.
+	@Time Complexity: O(1)
 	"""
 	def isMediumNode(self):
 		cnt=0
@@ -180,6 +196,7 @@ class AVLNode(object):
 	@pre: node.isMediumNode()==True
 	@rtype: AVLNode
 	@returns: The node of the real child of self.
+	@Time Complexity: O(1)
 	"""
 	def realChild(self):
 		if self.left.isRealNode():
@@ -188,15 +205,10 @@ class AVLNode(object):
 			return self.right
 
 	"""returns true if self is a left son and False if not
+	@Time Complexity: O(1)
 	"""
 	def isLeftSon(self):
 		return self.getParent()!=None and self.getParent().getLeft() is self
-
-	"""returns true if self is a right son and False if not
-	"""
-	def isRightSon(self):
-		return self.getParent()!=None and self.getParent().getRight() is self
-
 
 
 """
