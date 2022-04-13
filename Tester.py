@@ -924,7 +924,7 @@ class TestMavnatProject1(unittest.TestCase):
         # TODO:
         # concat a 10-leveled tree (~2047 nodes) with 20-leveled tree (~1048576 nodes)
         lst1 = ["Y","X","Z"]
-        for i in range(10): #20 was too much
+        for i in range(15): #20 was too much
             lst1 += ["x1"]*(2**i) + ["x2"]*(2**i) + ["x3"]*(2**i) + ["x4"]*(2**i)
         
         lst2 = ["B","A","C"]
@@ -933,10 +933,10 @@ class TestMavnatProject1(unittest.TestCase):
         
         tree1 = createTreeFromList(lst1)
         tree2 = createTreeFromList(lst2)
+        exp_lst = tree1.listToArray() + tree2.listToArray()
         heights_diff = tree1.concat(tree2)
-        exp_lst = lst1+lst2
         self.assertEqual(exp_lst, tree1.listToArray())
-        self.assertEqual(heights_diff, 5)
+        self.assertEqual(heights_diff, 10)
 
         ####################################
         # Case 4 - Different Maxinum States
