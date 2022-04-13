@@ -29,6 +29,7 @@ class AVLNode(object):
 	"""returns the left child
 	@rtype: AVLNode
 	@returns: the left child of self, None if there is no left child
+	@Time Complexity: O(1)
 	"""
 	def getLeft(self):
 		return self.left
@@ -37,6 +38,7 @@ class AVLNode(object):
 
 	@rtype: AVLNode
 	@returns: the right child of self, None if there is no right child
+	@Time Complexity: O(1)
 	"""
 	def getRight(self):
 		return self.right
@@ -45,6 +47,7 @@ class AVLNode(object):
 
 	@rtype: AVLNode
 	@returns: the parent of self, None if there is no parent
+	@Time Complexity: O(1)
 	"""
 	def getParent(self):
 		return self.parent
@@ -53,6 +56,7 @@ class AVLNode(object):
 
 	@rtype: str
 	@returns: the value of self, None if the node is virtual
+	@Time Complexity: O(1)
 	"""
 	def getValue(self):
 		return self.value
@@ -61,6 +65,7 @@ class AVLNode(object):
 
 	@rtype: int
 	@returns: the height of self, -1 if the node is virtual
+	@Time Complexity: O(1)
 	"""
 	def getHeight(self):
 		return self.height
@@ -69,6 +74,7 @@ class AVLNode(object):
 
 	@rtype: int
 	@returns: the size of self
+	@Time Complexity: O(1)
 	"""
 	def getSize(self):
 		return self.size
@@ -77,6 +83,7 @@ class AVLNode(object):
 		@rtype: int
 		@returns: the Balance Factor of self
 		@pre: self represent a "Real Node"
+		@Time Complexity: O(1)
 	"""	
 	def getBF(self):
 		return self.getLeft().getHeight() - self.getRight().getHeight()
@@ -85,6 +92,7 @@ class AVLNode(object):
 
 	@rtype: bool
 	@returns: False if self is a virtual node, True otherwise.
+	@Time Complexity: O(1)
 	"""	
 	def isRealNode(self):
 		return self.getLeft()!=None or self.getRight()!=None
@@ -97,6 +105,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setLeft(self, node):
 		self.left=node
@@ -106,6 +115,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setRight(self, node):
 		self.right=node
@@ -115,6 +125,7 @@ class AVLNode(object):
 
 	@type node: AVLNode
 	@param node: a node
+	@Time Complexity: O(1)
 	"""
 	def setParent(self, node):
 		self.parent=node
@@ -124,6 +135,7 @@ class AVLNode(object):
 
 	@type value: str
 	@param value: data
+	@Time Complexity: O(1)
 	"""
 	def setValue(self, value):
 		self.value=value
@@ -133,6 +145,7 @@ class AVLNode(object):
 
 	@type h: int
 	@param h: the height
+	@Time Complexity: O(1)
 	"""
 	def setHeight(self, h):
 		self.height=h
@@ -142,6 +155,7 @@ class AVLNode(object):
 
 	@type size: int
 	@param size: the size of the sub-tree 
+	@Time Complexity: O(1)
 	"""
 	def setSize(self, size):
 		self.size=size
@@ -155,6 +169,7 @@ class AVLNode(object):
 
 	@rtype: bool
 	@returns: True if self is a leaf node, False otherwise.
+	@Time Complexity: O(1)
 	"""
 	def isLeaf(self):
 		if self.getLeft().isRealNode() or self.getRight().isRealNode():
@@ -164,6 +179,7 @@ class AVLNode(object):
 	"""returns whether self is has exactly one real son
 	@rtype: bool
 	@returns: True if self has exactly one real child, False otherwise.
+	@Time Complexity: O(1)
 	"""
 	def isMediumNode(self):
 		cnt=0
@@ -179,6 +195,7 @@ class AVLNode(object):
 	@pre: node.isMediumNode()==True
 	@rtype: AVLNode
 	@returns: The node of the real child of self.
+	@Time Complexity: O(1)
 	"""
 	def realChild(self):
 		if self.getLeft().isRealNode():
@@ -187,15 +204,10 @@ class AVLNode(object):
 			return self.getRight()
 
 	"""returns true if self is a left son and False if not
+	@Time Complexity: O(1)
 	"""
 	def isLeftSon(self):
 		return self.getParent()!=None and self.getParent().getLeft() is self
-
-	"""returns true if self is a right son and False if not
-	"""
-	def isRightSon(self):
-		return self.getParent()!=None and self.getParent().getRight() is self
-
 
 
 """
@@ -527,23 +539,19 @@ class AVLTreeList(object):
 			self.concat_redirect(mid, self.getRoot(), node, None, mid, None)
 		self.rebalance(mid.getParent())
 
-	"""returns the root of a tree is a join of $left_root subtree and $right_root subtree 
-	   using $mid a connecting element
-	   @pre: left_root, mid, right_root are AVLNodes
-	   @post: left_root, mid and right_soot are concatenated into united tree
-	   method will create AVLTreeList from the given roots inorder to join them
-	   method let split make joins by just passing roots
+
+	"""returns a tree which its root is the given node
+	@rtype: AVLTreeList
+	@pre: node is AVLNode
+	@post: $node is the root of $tree
+	@post: $node.parent=None. Note that this means $node is "disconnected" from its old tree
 	"""
 	@staticmethod
-	def joinByRoot (left_root, mid, right_root):
-		left_root.setParent(None)
-		right_root.setParent(None)
-		left_tree = AVLTreeList()
-		left_tree.root = left_root
-		right_tree = AVLTreeList()
-		right_tree.root = right_root
-		left_tree.join(mid, right_tree)
-		return left_tree
+	def createTreeByRoot(node):
+		node.setParent(None)
+		tree = AVLTreeList()
+		tree.root = node
+		return tree
 
 	"""splits the list at the i'th index, Time Complexity: O(logn)
 
@@ -554,7 +562,6 @@ class AVLTreeList(object):
 	@returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
 	"""
-
 	def split(self, i):
 		# Create 2 instances of AVLTreeList which will be the lists after the split
 		left_tree = AVLTreeList()
@@ -578,15 +585,23 @@ class AVLTreeList(object):
 			if isLeft:
 				isLeft = next_parent.isLeftSon() # update this before the join operation
 												 # join in case pointers will change during join
-				right_tree = AVLTreeList.joinByRoot(right_tree.getRoot(), next_parent, next_parent.getRight())
+				# create tree from parent's right son:
+				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
+				# join trees:
+				right_tree.join(next_parent, tmp_right)
 			else:
 				isLeft = next_parent.isLeftSon() # update this before the join operation
 												 # join in case pointers will change during join
-				left_tree = AVLTreeList.joinByRoot(next_parent.getLeft(), next_parent, left_tree.getRoot())
+				# create trees from parent's left son:
+				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
+				# join trees:
+				tmp_left.join(next_parent, left_tree)
+				# in this case update left_tree:
+				left_tree = tmp_left
 			next_parent = next_parent_to_set
 
 		# set roots parents to None:	
-		left_tree.getRoot().setParent(None) 
+		left_tree.getRoot().setParent(None)
 		right_tree.getRoot().setParent(None)
 
 		# set lastitems, firstitems, add O(logn) - does not ruin complexity
@@ -597,12 +612,13 @@ class AVLTreeList(object):
 		return [left_tree, splitter.getValue() ,right_tree]
 
 
-	"""concatenates lst to self, Time Complexity: O(logn)
+	"""concatenates lst to self, Time Complexity:
 
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
 	@rtype: int
 	@returns: the absolute value of the difference between the height of the AVL trees joined
+	@Time Complexity: O(logn)
 	"""
 	def concat(self, lst):			
 		heights_diff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
@@ -659,12 +675,6 @@ class AVLTreeList(object):
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	@staticmethod
-	def findMinimalNodeByHeight(root, h):
-		while root.getHeight()>h:
-			root=root.getLeft()
-		return root
-
 	def findMinimalNodeByHeight(self, h):
 		node = self.getRoot()
 		while node.getHeight()>h:
@@ -676,12 +686,6 @@ class AVLTreeList(object):
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
 	"""
-	@staticmethod
-	def findMaximalNodeByHeight(root, h):
-		while root.height>h:
-			root=root.right
-		return root
-
 	def findMaximalNodeByHeight(self,h):
 		node = self.getRoot()
 		while node.height>h:
