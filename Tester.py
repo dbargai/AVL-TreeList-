@@ -348,7 +348,7 @@ class TestMavnatProject1(unittest.TestCase):
         tree.insert(1,1)
         for i in range(2,10):
             last=tree.lastitem
-            tree.createNode(last.right,i)
+            last.right.createNode(i)
             tree.lastitem=tree.lastitem.right
             node=tree.root
             while(node.right!=None):
@@ -362,7 +362,7 @@ class TestMavnatProject1(unittest.TestCase):
         tree.insert(0,8)
         for i in range(7,-1,-1):
             first=tree.firstitem
-            tree.createNode(first.left,i)
+            first.left.createNode(i)
             tree.firstitem=tree.firstitem.left
             node=tree.root
             while(node.left!=None):
