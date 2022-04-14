@@ -5,7 +5,12 @@
 #name2    - Or Shemesh 
 
  
-
+"""
+	@invs:
+	1. Node x is consodered virtual node iff (x.left=None and x.right=None and x.size=0 and x.height=-1)
+	2. Node x is a leaf iff (x.left is virtual and x.right is virtual)
+	3. There is no node with only one son as None
+"""
 class AVLNode(object):
 	"""Constructor, you are allowed to add more fields. 
 
@@ -212,13 +217,17 @@ class AVLNode(object):
 
 """
 A class implementing the ADT list, using an AVL tree.
+@invs: 
+	1. T is AVLTreeList implies T has at least one child (may be virtual)
+	2. For any ACLTreeList T: T.root.size = number of elements in the represented list
+	3. AVLTreeList T is empty iff T.root is virtual
 """
 
 class AVLTreeList(object):
 
 	"""
 	Constructor, you are allowed to add more fields.  
-
+	@Time Complexity: O(1)
 	"""
 	def __init__(self):
 		self.root = AVLNode(None)
@@ -233,6 +242,7 @@ class AVLTreeList(object):
 
 	@rtype: AVLNode
 	@returns: the root, virtual if the list is empty
+	@Time Complexity: O(1)
 	"""
 	def getRoot(self):
 		return self.root
@@ -241,6 +251,7 @@ class AVLTreeList(object):
 
 	@rtype: AVLNode
 	@returns: first item of the list
+	@Time Complexity: O(1)
 	"""
 	def getFirstItem(self):
 		return self.firstitem
@@ -249,6 +260,7 @@ class AVLTreeList(object):
 
 	@rtype: AVLNode
 	@returns: last item of the list
+	@Time Complexity: O(1)
 	"""
 	def getLastItem(self):
 		return self.lastitem
@@ -261,6 +273,7 @@ class AVLTreeList(object):
 
 	@type r: AVLNode
 	@param r: the root node of the tree
+	@Time Complexity: O(1)
 	"""
 	def setRoot(self, r):
 		self.root = r
@@ -269,6 +282,7 @@ class AVLTreeList(object):
 
 	@type first: AVLNode
 	@param first: the first item of the list
+	@Time Complexity: O(1)
 	"""
 	def setFirstItem(self, first):
 		self.firstitem = first
@@ -277,6 +291,7 @@ class AVLTreeList(object):
 
 	@type last: AVLNode
 	@param last: the last item of the list
+	@Time Complexity: O(1)
 	"""
 
 	def setLastItem(self, last):
@@ -286,6 +301,7 @@ class AVLTreeList(object):
 
 	@rtype: bool
 	@returns: True if the list is empty, False otherwise
+	@Time Complexity: O(1)
 	"""
 	def empty(self):
 		return True if self.length()==0 else False
@@ -294,12 +310,12 @@ class AVLTreeList(object):
 
 
 	"""retrieves the value of the i'th item in the list
-	time compexity: O(logn) - searching from root downway only
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
 	@rtype: str
 	@returns: the value of the i'th item in the list
+	@Time compexity: O(logn)
 	"""
 	def retrieve(self, i):
 		if (i<0 or i>self.length()-1):
@@ -308,12 +324,12 @@ class AVLTreeList(object):
 			return self.retrieve_node(i).getValue()
 
 	"""retrieves the i'th node in the list
-	Time Complexity: O(logn)
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: index in the list
 	@rtype: AVLNode
 	@returns: the node of the i'th item in the list
+	@Time Complexity: O(logn)
 	"""
 	def retrieve_node(self, i):
 		node=self.getRoot()
@@ -381,7 +397,7 @@ class AVLTreeList(object):
 			node.getRight().setParent(parent)
 		return None
 
-	"""inserts val at position i in the list, Time Complexity: O(logn)
+	"""inserts val at position i in the list
 
 	@type i: int
 	@pre: 0 <= i <= self.length()
@@ -390,6 +406,7 @@ class AVLTreeList(object):
 	@param val: the value we inserts
 	@rtype: list
 	@returns: the number of rebalancing operation due to AVL rebalancing
+	@Time Complexity: O(logn)
 	"""
 
 	def insert(self,i,val):
@@ -417,13 +434,14 @@ class AVLTreeList(object):
 		return self.rebalance(node)
 
 	
-	"""deletes the i'th item in the list, Time Complexity: O(logn)
+	"""deletes the i'th item in the list
 
 	@type i: int
 	@pre: 0 <= i < self.length()
 	@param i: The intended index in the list to be deleted
 	@rtype: int
 	@returns: the number of rebalancing operation due to AVL rebalancing
+	@Time Complexity: O(logn)
 	"""
 	def delete(self, i):
 		cnt_rotations=0
@@ -463,6 +481,7 @@ class AVLTreeList(object):
 
 	@rtype: str
 	@returns: the value of the first item, None if the list is empty
+	@Time Complexity: O(1)
 	"""
 	def first(self):
 		return self.firstitem.getValue()
@@ -471,14 +490,16 @@ class AVLTreeList(object):
 
 	@rtype: str
 	@returns: the value of the last item, None if the list is empty
+	@Time Complexity: O(1)
 	"""
 	def last(self):
 		return self.lastitem.getValue()
 
-	"""returns an array representing list, Time Complexity: O(n)
+	"""returns an array representing list
 
 	@rtype: list
 	@returns: a list of strings representing the data structure
+	@Time Complexity: O(n)
 	"""
 	def listToArray(self): #Use inorder recursion to append each node to the array
 		array = []
@@ -497,6 +518,7 @@ class AVLTreeList(object):
 
 	@rtype: int
 	@returns: the size of the list
+	@Time Complexity: O(1)
 	"""
 	def length(self):
 		return self.getRoot().getSize()
