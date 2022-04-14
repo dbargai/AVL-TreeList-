@@ -224,7 +224,7 @@ class AVLTreeList(object):
 		self.root = AVLNode(None)
 		self.firstitem= self.root
 		self.lastitem= self.root
-		# add your fields here
+		
 
 	################################
 	# Geters:
@@ -635,25 +635,29 @@ class AVLTreeList(object):
 		self.join(linker, lst)
 		return heights_diff
 
-	"""rebalancing the tree from a given node to the root
+
+	"""rebalancing the tree from a given node to the root, Time Complexity: O(root.height-start.height)
 	@rtype: int
 	@returns: a counter of the number of rotations performed
 	@Time Complexity: O(logn)
 	"""
+
 	def rebalance(self, start):
 		cnt=0
 		while (start !=None):
 			if abs(start.getBF())==2:
 				if start.getBF()<0:
 					if start.getRight().getBF()==1:
-						start=self.rotateRightThenLeft(start, start.getRight(), start.getRight().getLeft())
+						son=self.rotateRight(start.getRight(), start.getRight().getLeft())
+						start=self.rotateLeft(start,son)
 						cnt+=2
 					else:
 						start=self.rotateLeft(start, start.getRight())
 						cnt+=1
 				else: #BF is +2
 					if start.getLeft().getBF()==-1:
-						start=self.rotateLeftThenRight(start, start.getLeft(), start.getLeft().getRight())
+						son=self.rotateLeft(start.getLeft(), start.getLeft().getRight())
+						start=self.rotateRight(start,son)
 						cnt+=2
 					else:
 						start=self.rotateRight(start, start.getLeft())
@@ -667,7 +671,7 @@ class AVLTreeList(object):
 		return cnt
 	
 
-	"""returns minimal-index node with height<=h
+	"""returns minimal-index node with height<=h, Time Complexity: O(root.height-h)
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
@@ -679,7 +683,7 @@ class AVLTreeList(object):
 			node = node.getLeft()
 		return node
 
-	"""returns maximal-index node with height<=h
+	"""returns maximal-index node with height<=h , Time Complexity: O(root.height-h))
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
@@ -741,7 +745,7 @@ class AVLTreeList(object):
 	@pre: parent.left.height-parent.right.height==2
 	@param parent: the old parent which we need to rotate for balancing
 	@type leftSon: AVLNode
-	@pre: leftSon.left.height-leftSon.right.height==1
+	@pre: leftSon.left.height-leftSon.right.height==1 or ==0
 	@param parent: the old left son which we need to rotate for balancing
 	@rtype: AVLNode
 	@returns: The parent of the given nodes
@@ -795,84 +799,11 @@ class AVLTreeList(object):
 		self.updateHeight(parent,rightSon)
 		return rightSon
 
-	"""left then right rotation to balance the list
-
-	@type parent: AVLNode
-	@pre: parent.left.height-parent.right.height==2
-	@param parent: the old parent which we need to rotate for balancing
-	@type leftSon: AVLNode
-	@pre: leftSon.left.height-leftSon.right.height==-1
-	@param parent: the old left son which we need to rotate for balancing
-	@type leftSon: AVLNode
-	@pre: leftRightSon.left.height-leftRightSon.right.height==1
-	@param parent: the right son of the left son which we need to rotate for balancing
-	@rtype: AVLNode
-	@returns: The parent of the given nodes
-	@Time Complexity: O(1)
-	"""
-	def rotateLeftThenRight(self,parent,leftSon,leftRightSon):
-		parent.setLeft(leftRightSon.getRight())
-		parent.getLeft().setParent(parent)
-		leftSon.setRight(leftRightSon.left)
-		leftSon.getRight().setParent(leftSon)
-		leftRightSon.setLeft(leftSon)
-		leftSon.setParent(leftRightSon)
-		leftRightSon.setRight(parent)
-		if self.getRoot()==parent: #if parent is root
-			self.setRoot(leftRightSon)
-			leftRightSon.setParent(None)		
-		elif parent.getParent().getLeft()==parent: #if parent is left son
-			parent.getParent().setLeft(leftRightSon)
-			leftRightSon.setParent(parent.getParent())
-		else:
-			parent.getParent().setRight(leftRightSon)
-			leftRightSon.setParent(parent.getParent())
-		parent.setParent(leftRightSon)
-		self.updateSize(parent,leftSon,leftRightSon)
-		self.updateHeight(parent,leftSon,leftRightSon)
-		return leftRightSon
-
-	"""right then left rotation to balance the list
-
-	@type parent: AVLNode
-	@pre: parent.left.height-parent.right.height==-2
-	@param parent: the old parent which we need to rotate for balancing
-	@type rightSon: AVLNode
-	@pre: rightSon.left.height-rightSon.right.height==1
-	@param parent: the old left son which we need to rotate for balancing
-	@type rightSon: AVLNode
-	@pre: rightLeftSon.left.height-rightLeftSon.right.height==-1
-	@param parent: the left son of the right son which we need to rotate for balancing
-	@rtype: AVLNode
-	@returns: The parent of the given nodes
-	@Time Complexity: O(1)
-	"""
-	def rotateRightThenLeft(self,parent,rightSon,rightLeftSon):
-		parent.setRight(rightLeftSon.getLeft())
-		parent.getRight().setParent(parent)
-		rightSon.setLeft(rightLeftSon.getRight())
-		rightSon.getLeft().setParent(rightSon)
-		rightLeftSon.setRight(rightSon)
-		rightSon.setParent(rightLeftSon)
-		rightLeftSon.setLeft(parent)
-		if self.getRoot()==parent: #if parent is root
-			self.setRoot(rightLeftSon)
-			rightLeftSon.setParent(None)		
-		elif parent.getParent().getLeft()==parent: #if parent is left son
-			parent.getParent().setLeft(rightLeftSon)
-			rightLeftSon.setParent(parent.getParent())
-		else:
-			parent.getParent().setRight(rightLeftSon)
-			rightLeftSon.setParent(parent.getParent())
-		parent.setParent(rightLeftSon)
-		self.updateSize(parent,rightSon,rightLeftSon)
-		self.updateHeight(parent,rightSon,rightLeftSon)
-		return rightLeftSon
 
 	"""calculates and sets the size of all given nodes by order
 
 	@rtype: None
-	@returns: the root, None if the list is empty
+	@returns: None
 	@Time Complexity: O(1)
 	"""
 	def updateSize(self,node1,node2=None,node3=None):
@@ -885,7 +816,7 @@ class AVLTreeList(object):
 	"""calculates and sets the height of all given nodes by order
 
 	@rtype: None
-	@returns: the root, None if the list is empty
+	@returns: None
 	@Time Complexity: O(1)
 	"""
 	def updateHeight(self,node1,node2=None,node3=None):
