@@ -266,7 +266,7 @@ class AVLNode(object):
 			parent.getLeft().setParent(parent)
 		else: #node is a right son
 			parent.setRight(self.realChild())
-			self.getRight().setParent(parent)
+			parent.getRight().setParent(parent)
 
 
 
