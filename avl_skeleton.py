@@ -636,10 +636,10 @@ class AVLTreeList(object):
 		return heights_diff
 
 
-	"""rebalancing the tree from a given node to the root, Time Complexity: O(root.height-start.height)
+	"""rebalancing the tree from a given node to the root, 
 	@rtype: int
 	@returns: a counter of the number of rotations performed
-	@Time Complexity: O(logn)
+	@Time Complexity: O(self.height-start.height)
 	"""
 
 	def rebalance(self, start):
@@ -671,7 +671,7 @@ class AVLTreeList(object):
 		return cnt
 	
 
-	"""returns minimal-index node with height<=h, Time Complexity: O(root.height-h)
+	"""returns minimal-index node with height<=h, 
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
