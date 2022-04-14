@@ -542,14 +542,14 @@ class AVLTreeList(object):
 		# link between relevant nodes based on trees' heights:
 		if self.getRoot().getHeight() > right_lst.getRoot().getHeight():
 			node=self.findMaximalNodeByHeight(right_lst.getRoot().getHeight())
-			self.link_nodes(mid, node, right_lst.getRoot(), node.getParent(), 'R')
+			AVLTreeList.link_nodes(mid, node, right_lst.getRoot(), node.getParent(), 'R')
 		elif self.getRoot().getHeight() < right_lst.getRoot().getHeight():
 			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.link_nodes(mid, self.getRoot(), node, node.getParent(), 'L')
+			AVLTreeList.link_nodes(mid, self.getRoot(), node, node.getParent(), 'L')
 			self.setRoot(right_lst.getRoot())
 		else:
 			node=right_lst.getRoot()
-			self.link_nodes(mid, self.getRoot(), node, None, None)
+			AVLTreeList.link_nodes(mid, self.getRoot(), node, None, None)
 			self.setRoot(mid)
 		
 		# execute rebalance starting from mid.parent:
