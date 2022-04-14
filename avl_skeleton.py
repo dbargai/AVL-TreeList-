@@ -226,18 +226,6 @@ class AVLTreeList(object):
 		self.lastitem= self.root
 		
 
-
-	###############################################
-	# This methods has no use right now
-	# delete them before submit if there's no use for it till that point
-	#################################################
-
-	# def createTreeByRoot(self, root_, first, last):
-	# 	self.root = root_
-	# 	self.firstitem=first
-	# 	self.lastitem=last
-
-
 	################################
 	# Geters:
 	################################
@@ -514,13 +502,14 @@ class AVLTreeList(object):
 		return self.getRoot().getSize()
 
 	"""join left_lst and right_lst using a 'middle' node.
-	Time Complexity: O(|left_.height - right_lst.height|)
 	@type left_lst, right_lst: AVLTreeList
 	@type mid = AVLNode
 	@post: left_lst = left_lst + mid + right_lst
 	@returns: root of left_lst after the join operation
+	@Time Complexity: O(|self.height - right_lst.height|)
 	"""
 	def join (self, mid, right_lst):
+		# set lastitem, firstitem:
 		if self.length() == 0:
 			self.setFirstItem(mid) if mid!=None else right_lst.getFirstItem()
 		if right_lst.length() == 0:
@@ -528,15 +517,20 @@ class AVLTreeList(object):
 		else:
 			self.setLastItem(right_lst.getLastItem())
 		
+		# link between relevant nodes based on trees' heights:
 		if self.getRoot().getHeight() > right_lst.getRoot().getHeight():
 			node=self.findMaximalNodeByHeight(right_lst.getRoot().getHeight())
-			self.concat_redirect(mid, node, right_lst.getRoot(), node.getParent(), self.getRoot(), 'R')
+			self.link_nodes(mid, node, right_lst.getRoot(), node.getParent(), 'R')
 		elif self.getRoot().getHeight() < right_lst.getRoot().getHeight():
 			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(mid, self.getRoot(), node, node.getParent(), right_lst.getRoot(), 'L')
+			self.link_nodes(mid, self.getRoot(), node, node.getParent(), 'L')
+			self.setRoot(right_lst.getRoot())
 		else:
-			node=right_lst.findMinimalNodeByHeight(self.getRoot().getHeight())
-			self.concat_redirect(mid, self.getRoot(), node, None, mid, None)
+			node=right_lst.getRoot()
+			self.link_nodes(mid, self.getRoot(), node, None, None)
+			self.setRoot(mid)
+		
+		# execute rebalance starting from mid.parent:
 		self.rebalance(mid.getParent())
 
 
@@ -545,6 +539,7 @@ class AVLTreeList(object):
 	@pre: node is AVLNode
 	@post: $node is the root of $tree
 	@post: $node.parent=None. Note that this means $node is "disconnected" from its old tree
+	@Time Complexity: O(1)
 	"""
 	@staticmethod
 	def createTreeByRoot(node):
@@ -561,6 +556,7 @@ class AVLTreeList(object):
 	@rtype: list
 	@returns: a list [left, val, right], where left is an AVLTreeList representing the list until index i-1,
 	right is an AVLTreeList representing the list from index i+1, and val is the value at the i'th index.
+	@ Time Complexity: O(logn)
 	"""
 	def split(self, i):
 		# Create 2 instances of AVLTreeList which will be the lists after the split
@@ -612,7 +608,7 @@ class AVLTreeList(object):
 		return [left_tree, splitter.getValue() ,right_tree]
 
 
-	"""concatenates lst to self, Time Complexity:
+	"""concatenates lst to self
 
 	@type lst: AVLTreeList
 	@param lst: a list to be concatenated after self
@@ -633,15 +629,17 @@ class AVLTreeList(object):
 			return heights_diff
 
 		# if both lists aren't empty:
-		val = self.getLastItem().getValue()
-		middle = AVLNode(val)
+		val = self.lastitem.getValue()
+		linker = AVLNode(val)
 		self.delete(self.length()-1)
-		self.join(middle, lst)
+		self.join(linker, lst)
 		return heights_diff
+
 
 	"""rebalancing the tree from a given node to the root, Time Complexity: O(root.height-start.height)
 	@rtype: int
 	@returns: a counter of the number of rotations performed
+	@Time Complexity: O(logn)
 	"""
 
 	def rebalance(self, start):
@@ -677,6 +675,7 @@ class AVLTreeList(object):
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
+	@Time Complexity: O(self.height - h)
 	"""
 	def findMinimalNodeByHeight(self, h):
 		node = self.getRoot()
@@ -688,6 +687,7 @@ class AVLTreeList(object):
 	@rtype: AVLNodes
 	@pre: 0 ≤ h ≤ self.root.height
 	@type h: int
+	@Time Complexity: O(self.height - h)
 	"""
 	def findMaximalNodeByHeight(self,h):
 		node = self.getRoot()
@@ -695,12 +695,14 @@ class AVLTreeList(object):
 			node = node.getRight()
 		return node
 
-	"""set sons and parents fields for concat (O(1))
+	"""set sons and parents fields for join
 	@rtype: None
-	@pre: $side in {'R', 'L'}
-	@type s: string
+	@pre: $side == 'R' or $side = 'L'
+	@post: $mid's sons are $left and $right and its parent is $parent
+	@Time Complexity: O(1)
 	"""
-	def concat_redirect(self, mid, left, right, parent , newRoot, side):
+	@staticmethod
+	def link_nodes(mid, left, right, parent, side):
 		mid.setLeft(left)
 		mid.getLeft().setParent(mid)
 		mid.setRight(right)
@@ -713,15 +715,15 @@ class AVLTreeList(object):
 				parent.setRight(mid)
 			else:
 				parent.setLeft(mid)
-		self.root = newRoot
 
 
-	"""searches for a *value* in the list, Time Complexity: O(n)
+	"""searches for a *value* in the list
 
 	@type val: str
 	@param val: a value to be searched
 	@rtype: int
 	@returns: the first index that contains val, -1 if not found.
+	@Time Complexity: O(n)
 	"""
 	def search(self, val):
 		return self.search_rec(self.getRoot(), val, 0)
@@ -737,7 +739,6 @@ class AVLTreeList(object):
 		else:
 			return self.search_rec(node.getRight(),val, cnt+ node.getLeft().getSize()+1)
 
-
 	"""right rotation to balance the list
 
 	@type parent: AVLNode
@@ -748,6 +749,7 @@ class AVLTreeList(object):
 	@param parent: the old left son which we need to rotate for balancing
 	@rtype: AVLNode
 	@returns: The parent of the given nodes
+	@Time complexity: O(1)
 	"""
 	def rotateRight(self,parent,leftSon): 	
 		parent.setLeft(leftSon.right)
@@ -777,6 +779,7 @@ class AVLTreeList(object):
 	@param parent: the old left son which we need to rotate for balancing
 	@rtype: AVLNode
 	@returns: The parent of the given nodes
+	@Time Complexity: O(1)
 	"""
 	def rotateLeft(self,parent,rightSon): 
 		parent.setRight(rightSon.left)
@@ -801,6 +804,7 @@ class AVLTreeList(object):
 
 	@rtype: None
 	@returns: None
+	@Time Complexity: O(1)
 	"""
 	def updateSize(self,node1,node2=None,node3=None):
 		node1.setSize(1+node1.getLeft().getSize()+node1.getRight().getSize())
@@ -813,6 +817,7 @@ class AVLTreeList(object):
 
 	@rtype: None
 	@returns: None
+	@Time Complexity: O(1)
 	"""
 	def updateHeight(self,node1,node2=None,node3=None):
 		node1.setHeight((1+max(node1.getLeft().getHeight(),node1.getRight().getHeight())))
@@ -821,11 +826,12 @@ class AVLTreeList(object):
 		if node3!=None:
 			node3.setHeight((1+max(node3.getLeft().getHeight(),node3.getRight().getHeight())))
 
-	"""finds predecessor of a given node, Time Complexity: O(logn)
+	"""finds predecessor of a given node
 	@pre: self.isRealNode(node.getLeft()) 
 	@type: AVLNode
 	@rtype: AVLNode
 	@returns: the predecessor
+	@Time Complexity: O(logn)
 	"""
 	def predecessor(self,node):
 		if node.getLeft().isRealNode():
@@ -839,12 +845,13 @@ class AVLTreeList(object):
 			parent=node.getParent()
 		return parent
 	
-	"""finds successor of a given node, Time Complexity: O(logn)
+	"""finds successor of a given node
 	Time Complexity (worst case): O(logn) - going downward only or upward only
 	@pre: self.isRealNode(node.getR())
 	@type: AVLNode
 	@rtype: AVLNode
 	@returns: the predecessor
+	@Time Complexity: O(logn)
 	"""
 	def successor(self,node):
 		if node.getRight().isRealNode():
