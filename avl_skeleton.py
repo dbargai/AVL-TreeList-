@@ -214,14 +214,14 @@ class AVLNode(object):
 	def isLeftSon(self):
 		return self.getParent()!=None and self.getParent().getLeft() is self
 
-	"""creates a node in a given location with two virtual leaves
+	"""convert a virtual node to a real node by a given value
 
 	@type node: AVLNode
-	@pre: 
-	@param node: the "virtual" node from which we create the new real node
-	@type val: any object
-	@pre: 
+	@pre: self is a virtual node
+	@param self: the "virtual" node from which we create the new real node
+	@type val: str
 	@param val: the value of the new node we create  
+	@post: self is a leaf and self.value=val
 	@rtype: None
 	@returns: None
 	"""
@@ -236,7 +236,7 @@ class AVLNode(object):
 		return None
 
 
-	"""deletes a node and turn him to "virtual Node"
+	"""deletes a node by turning it into a "virtual Node"
 
 	@type Node: AVLNode
 	@pre: Node is a leaf 
@@ -251,6 +251,23 @@ class AVLNode(object):
 		self.setSize(0)
 		return None
 	
+	
+	"""deletes a middle node by "skipping" over it
+
+	@type node: AVLNode
+	@pre: node has one child (node.isMediumNode()==True)
+	@rtype: None
+	@returns: None
+	"""
+	def deleteMiddleNode(self):
+		parent=self.getParent()
+		if parent.getLeft()==self: #node is a left son	
+			parent.setLeft(self.realChild())
+			parent.getLeft().setParent(parent)
+		else: #node is a right son
+			parent.setRight(self.realChild())
+			self.getRight().setParent(parent)
+
 
 
 """
@@ -379,24 +396,6 @@ class AVLTreeList(object):
 				node=node.getRight()
 		return node
 
-	"""deletes a middle node and "skip" over him
-
-	@type Node: AVLNode
-	@pre: Node has one child
-	@rtype: None
-	@returns: None
-	"""
-
-	def deleteMiddleNode(self,node):
-		parent=node.getParent()
-		if parent.getLeft()==node: #node is a left son	
-			parent.setLeft(node.realChild())
-			parent.getLeft().setParent(parent)
-		else: #node is a right son
-			parent.setRight(node.realChild())
-			node.getRight().setParent(parent)
-		return None
-
 	"""inserts val at position i in the list
 
 	@type i: int
@@ -408,7 +407,6 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	@Time Complexity: O(logn)
 	"""
-
 	def insert(self,i,val):
 		if self.empty(): 
 			self.root.createNode(val) 
@@ -466,13 +464,13 @@ class AVLTreeList(object):
 				self.setRoot(node.realChild())
 				self.getRoot().setParent(None)
 			else:
-				self.deleteMiddleNode(node)
+				node.deleteMiddleNode()
 			parent=node.getParent()
 		else: #node has two real children
 			successor=self.successor(node) #physical deleted node
 			parent=successor.getParent() 
 			node.setValue(successor.getValue())
-			successor.deleteNode() if successor.isLeaf() else self.deleteMiddleNode(successor)
+			successor.deleteNode() if successor.isLeaf() else successor.deleteMiddleNode()
 		cnt_rotations=self.rebalance(parent)
 		return cnt_rotations
 
