@@ -629,6 +629,68 @@ class AVLTreeList(object):
 		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
 		return [left_tree, splitter.getValue() ,right_tree]
 
+	# split version fir esperiment, delete before submit:
+	def splitExp(self, i):
+		# Create 2 instances of AVLTreeList which will be the lists after the split
+		left_tree = AVLTreeList()
+		right_tree = AVLTreeList()
+
+		# Find splitter node
+		splitter = self.retrieve_node(i)
+		
+		next_parent = splitter.getParent() # keep original parent 
+										   # in case pointers will change during join
+
+		# Set roots:
+		left_tree.setRoot(splitter.getLeft())
+		right_tree.setRoot(splitter.getRight())
+
+		isLeft = splitter.isLeftSon()
+
+		max=0; cnt=0; sum=0
+
+		while next_parent != None:
+			next_parent_to_set = next_parent.getParent() # keep next parent now in case 
+														 # pointers will change during join
+			if isLeft:
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				# create tree from parent's right son:
+				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
+				cnt += 1
+				diff = abs(right_tree.getRoot().getHeight() - tmp_right.getRoot().getHeight())
+				sum += diff
+				if diff >max: max = diff
+				# join trees:
+				right_tree.join(next_parent, tmp_right)
+				
+			else:
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				# create trees from parent's left son:
+				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
+				cnt += 1
+				diff = abs(left_tree.getRoot().getHeight() - tmp_left.getRoot().getHeight())
+				sum += diff
+				if diff >max: max = diff
+				# join trees:
+				tmp_left.join(next_parent, left_tree)
+				# in this case update left_tree:
+				left_tree = tmp_left
+			next_parent = next_parent_to_set
+
+		# set roots parents to None:	
+		left_tree.getRoot().setParent(None)
+		right_tree.getRoot().setParent(None)
+
+		# set lastitems, firstitems, add O(logn) - does not ruin complexity
+		left_tree.setFirstItem(self.getFirstItem()) if i!=0 else left_tree.findMinimalNodeByHeight(0)
+		left_tree.setLastItem(left_tree.findMaximalNodeByHeight(0))
+		right_tree.setFirstItem(right_tree.findMinimalNodeByHeight(0))
+		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
+		avg = sum/cnt
+		return [left_tree, splitter.getValue() ,right_tree, avg, max]
+
 
 	"""concatenates lst to self
 
