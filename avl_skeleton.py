@@ -359,7 +359,7 @@ class AVLTreeList(object):
 	@Time Complexity: O(1)
 	"""
 	def empty(self):
-		return True if self.length()==0 else False
+		return True if self.root==None or self.length()==0 else False
 
 
 
@@ -468,6 +468,7 @@ class AVLTreeList(object):
 			parent=node.getParent()
 		else: #node has two real children
 			successor=self.successor(node) #physical deleted node
+			self.setLastItem(node) if successor==self.getLastItem() else None
 			parent=successor.getParent() 
 			node.setValue(successor.getValue())
 			successor.deleteNode() if successor.isLeaf() else successor.deleteMiddleNode()
