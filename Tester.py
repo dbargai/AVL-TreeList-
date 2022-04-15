@@ -1,5 +1,6 @@
 import unittest
 import avl_skeleton as AVLTreeList
+import unbalancedTree as unbalancedTree
 import math
 import random
 
@@ -340,6 +341,33 @@ class TestMavnatProject1(unittest.TestCase):
         tree1 = createTreeFromList(["a","b","c","d","e", None, None, "f", None, None, None, None, None, None, None])
         self.assertEqual(tree1, False)
 
+    def testUnbalancedTree(self):
+        unbalanced=unbalancedTree.AVLTreeList()
+        balanced=AVLTreeList.AVLTreeList()
+        for i in range(10):
+            cnt=unbalanced.insert(i,i)
+            if i>0: 
+                self.assertEqual(i,cnt)
+            printTreefinal(unbalanced)
+        for i in range(10):
+            cnt=unbalanced.delete(0)
+            self.assertEqual(0,cnt)
+        self.assertEqual(True,unbalanced.empty())
+        ###### checking if building a balanced tree equals to AVL #####
+        #[0-0,2-0,2,4,6-0,2,4,6,8,10,12,14-.......]#
+        for j in range(5):
+            for i in range(0,2**j-1,2):
+                unbalanced.insert(i,"a")
+            if j==4:
+                for k in range (2**j-1):
+                    balanced.insert(0,"a")
+        printTreefinal(balanced)
+        printTreefinal(unbalanced)
+        self.assertEqual(True,compareTrees(balanced,unbalanced))
+        for i in range(2**4-2,-1,-2):
+            unbalanced.delete(i)
+            balanced.delete(i)
+            self.assertEqual(True,compareTrees(balanced,unbalanced))
 
 
     def testisAVL(self):
