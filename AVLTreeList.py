@@ -378,13 +378,11 @@ class AVLTreeList(object):
 	@returns: the value of the i'th item in the list
 	@Time compexity: O(logn)
 	"""
-	def retrieve2(self, i):
+	def retrieve(self, i):
 		if (i<0 or i>self.length()-1):
 			return None
 		else:
-			res=self.retrieve_node2(i)
-			return res[0].getValue(),res[1]
-
+			return self.retrieve_node(i).getValue()
 
 	"""retrieves the i'th node in the list
 	@type i: int
@@ -394,18 +392,16 @@ class AVLTreeList(object):
 	@returns: the node of the i'th item in the list
 	@Time Complexity: O(logn)
 	"""
-	def retrieve_node2(self, i):
+
+	def retrieve_node(self, i):
 		node=self.getRoot()
-		depth=0
 		while i!=node.getLeft().getSize(): #loop expects virtual node to exist and have size=0
 			if node.getLeft().getSize()>i:
 				node=node.getLeft()
 			else:
 				i = i-node.getLeft().getSize()-1
 				node=node.getRight()
-			depth+=1
-		return node,depth
-    
+		return node
 
 	"""inserts val at position i in the list
 
@@ -418,23 +414,19 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	@Time Complexity: O(logn)
 	"""
-
-	def insert2(self,i,val):
-		depth=0
+	def insert(self,i,val):
 		if self.empty(): 
 			self.root.createNode(val) 
 			self.setFirstItem(self.root)
 			self.setLastItem(self.root)
-			return 0,0
+			return 0
 		if i==self.length(): #maintain first and last pointers
 			max=self.getLastItem()
 			node=max.getRight()
 			node.createNode(val)
 			self.setLastItem(node)
 		else:
-			res=self.retrieve_node2(i)
-			curr=res[0] 
-			depth=res[1]
+			curr=self.retrieve_node(i) 
 			if not curr.getLeft().isRealNode(): 
 				node=curr.getLeft()
 				node.createNode(val)
@@ -444,9 +436,7 @@ class AVLTreeList(object):
 				node.createNode(val)
 			if i==0:
 				self.setFirstItem(node)
-		return self.rebalance(node),depth
-
-
+		return self.rebalance(node)
 	
 	"""deletes the i'th item in the list
 
@@ -528,68 +518,6 @@ class AVLTreeList(object):
 		listToArrayRec(self.getRoot(),array)
 		return array
 
-	# split version fir esperiment, delete before submit:
-	def splitExp(self, i):
-		# Create 2 instances of AVLTreeList which will be the lists after the split
-		left_tree = AVLTreeList()
-		right_tree = AVLTreeList()
-
-		# Find splitter node
-		splitter = self.retrieve_node(i)
-		
-		next_parent = splitter.getParent() # keep original parent 
-										   # in case pointers will change during join
-
-		# Set roots:
-		left_tree.setRoot(splitter.getLeft())
-		right_tree.setRoot(splitter.getRight())
-
-		isLeft = splitter.isLeftSon()
-
-		max=0; cnt=0; sum=0
-
-		while next_parent != None:
-			next_parent_to_set = next_parent.getParent() # keep next parent now in case 
-														 # pointers will change during join
-			if isLeft:
-				isLeft = next_parent.isLeftSon() # update this before the join operation
-												 # join in case pointers will change during join
-				# create tree from parent's right son:
-				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
-				cnt += 1
-				diff = abs(right_tree.getRoot().getHeight() - tmp_right.getRoot().getHeight())
-				sum += diff
-				if diff >max: max = diff
-				# join trees:
-				right_tree.join(next_parent, tmp_right)
-				
-			else:
-				isLeft = next_parent.isLeftSon() # update this before the join operation
-												 # join in case pointers will change during join
-				# create trees from parent's left son:
-				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
-				cnt += 1
-				diff = abs(left_tree.getRoot().getHeight() - tmp_left.getRoot().getHeight())
-				sum += diff
-				if diff >max: max = diff
-				# join trees:
-				tmp_left.join(next_parent, left_tree)
-				# in this case update left_tree:
-				left_tree = tmp_left
-			next_parent = next_parent_to_set
-
-		# set roots parents to None:	
-		left_tree.getRoot().setParent(None)
-		right_tree.getRoot().setParent(None)
-
-		# set lastitems, firstitems, add O(logn) - does not ruin complexity
-		left_tree.setFirstItem(self.getFirstItem()) if i!=0 else left_tree.findMinimalNodeByHeight(0)
-		left_tree.setLastItem(left_tree.findMaximalNodeByHeight(0))
-		right_tree.setFirstItem(right_tree.findMinimalNodeByHeight(0))
-		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
-		avg = sum/cnt
-		return [left_tree, splitter.getValue() ,right_tree, avg, max]
-
 	"""rebalancing the tree from a given node to the root, 
 	@rtype: int
 	@returns: a counter of the number of rotations performed
@@ -598,7 +526,24 @@ class AVLTreeList(object):
 	def rebalance(self, start):
 		cnt=0
 		while (start !=None):
-			if True:
+			if abs(start.getBF())==2:
+				if start.getBF()<0:
+					if start.getRight().getBF()==1:
+						son=self.rotateRight(start.getRight(), start.getRight().getLeft())
+						start=self.rotateLeft(start,son)
+						cnt+=2
+					else:
+						start=self.rotateLeft(start, start.getRight())
+						cnt+=1
+				else: #BF is +2
+					if start.getLeft().getBF()==-1:
+						son=self.rotateLeft(start.getLeft(), start.getLeft().getRight())
+						start=self.rotateRight(start,son)
+						cnt+=2
+					else:
+						start=self.rotateRight(start, start.getLeft())
+						cnt+=1
+			else:
 				prev_height=start.getHeight()
 				self.updateHeight(start)
 				if prev_height!=start.getHeight(): cnt+=1 
