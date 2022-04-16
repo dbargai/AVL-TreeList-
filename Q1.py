@@ -1,4 +1,4 @@
-import avl_skeleton as AVLTreeList
+import AVLTreeList as AVLTreeList
 import random 
 import sys
 
