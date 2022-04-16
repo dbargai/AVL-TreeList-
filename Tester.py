@@ -531,6 +531,7 @@ class TestMavnatProject1(unittest.TestCase):
         tree=createTreeFromList([5,2,7,1,None,None,8])
         tree.delete(2)
         self.assertEqual(tree.getRoot().getValue(),7) 
+        
  
 
     
