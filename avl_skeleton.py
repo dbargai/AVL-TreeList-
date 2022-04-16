@@ -361,8 +361,14 @@ class AVLTreeList(object):
 	def empty(self):
 		return True if self.root==None or self.length()==0 else False
 
+	"""returns the size of the list 
 
-
+	@rtype: int
+	@returns: the size of the list
+	@Time Complexity: O(1)
+	"""
+	def length(self):
+		return self.getRoot().getSize()
 
 	"""retrieves the value of the i'th item in the list
 	@type i: int
@@ -430,7 +436,6 @@ class AVLTreeList(object):
 			if i==0:
 				self.setFirstItem(node)
 		return self.rebalance(node)
-
 	
 	"""deletes the i'th item in the list
 
@@ -475,7 +480,6 @@ class AVLTreeList(object):
 		cnt_rotations=self.rebalance(parent)
 		return cnt_rotations
 
-
 	"""returns the value of the first item in the list
 
 	@rtype: str
@@ -513,14 +517,292 @@ class AVLTreeList(object):
 		listToArrayRec(self.getRoot(),array)
 		return array
 
-	"""returns the size of the list 
+	# split version fir esperiment, delete before submit:
+	def splitExp(self, i):
+		# Create 2 instances of AVLTreeList which will be the lists after the split
+		left_tree = AVLTreeList()
+		right_tree = AVLTreeList()
 
+		# Find splitter node
+		splitter = self.retrieve_node(i)
+		
+		next_parent = splitter.getParent() # keep original parent 
+										   # in case pointers will change during join
+
+		# Set roots:
+		left_tree.setRoot(splitter.getLeft())
+		right_tree.setRoot(splitter.getRight())
+
+		isLeft = splitter.isLeftSon()
+
+		max=0; cnt=0; sum=0
+
+		while next_parent != None:
+			next_parent_to_set = next_parent.getParent() # keep next parent now in case 
+														 # pointers will change during join
+			if isLeft:
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				# create tree from parent's right son:
+				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
+				cnt += 1
+				diff = abs(right_tree.getRoot().getHeight() - tmp_right.getRoot().getHeight())
+				sum += diff
+				if diff >max: max = diff
+				# join trees:
+				right_tree.join(next_parent, tmp_right)
+				
+			else:
+				isLeft = next_parent.isLeftSon() # update this before the join operation
+												 # join in case pointers will change during join
+				# create trees from parent's left son:
+				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
+				cnt += 1
+				diff = abs(left_tree.getRoot().getHeight() - tmp_left.getRoot().getHeight())
+				sum += diff
+				if diff >max: max = diff
+				# join trees:
+				tmp_left.join(next_parent, left_tree)
+				# in this case update left_tree:
+				left_tree = tmp_left
+			next_parent = next_parent_to_set
+
+		# set roots parents to None:	
+		left_tree.getRoot().setParent(None)
+		right_tree.getRoot().setParent(None)
+
+		# set lastitems, firstitems, add O(logn) - does not ruin complexity
+		left_tree.setFirstItem(self.getFirstItem()) if i!=0 else left_tree.findMinimalNodeByHeight(0)
+		left_tree.setLastItem(left_tree.findMaximalNodeByHeight(0))
+		right_tree.setFirstItem(right_tree.findMinimalNodeByHeight(0))
+		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
+		avg = sum/cnt
+		return [left_tree, splitter.getValue() ,right_tree, avg, max]
+
+	"""rebalancing the tree from a given node to the root, 
 	@rtype: int
-	@returns: the size of the list
+	@returns: a counter of the number of rotations performed
+	@Time Complexity: O(self.height-start.height)
+	"""
+	def rebalance(self, start):
+		cnt=0
+		while (start !=None):
+			if abs(start.getBF())==2:
+				if start.getBF()<0:
+					if start.getRight().getBF()==1:
+						son=self.rotateRight(start.getRight(), start.getRight().getLeft())
+						start=self.rotateLeft(start,son)
+						cnt+=2
+					else:
+						start=self.rotateLeft(start, start.getRight())
+						cnt+=1
+				else: #BF is +2
+					if start.getLeft().getBF()==-1:
+						son=self.rotateLeft(start.getLeft(), start.getLeft().getRight())
+						start=self.rotateRight(start,son)
+						cnt+=2
+					else:
+						start=self.rotateRight(start, start.getLeft())
+						cnt+=1
+			else:
+				prev_height=start.getHeight()
+				self.updateHeight(start)
+				if prev_height!=start.getHeight(): cnt+=1 
+			self.updateSize(start)
+			start=start.getParent()
+		return cnt
+	
+	"""finds predecessor of a given node
+	@pre: self.isRealNode(node.getLeft()) 
+	@type: AVLNode
+	@rtype: AVLNode
+	@returns: the predecessor
+	@Time Complexity: O(logn)
+	"""
+	def predecessor(self,node):
+		if node.getLeft().isRealNode():
+			start=node.getLeft()
+			while (start.getRight().isRealNode()):
+				start=start.getRight()
+			return start			
+		parent=node.getParent()
+		while parent!=None and parent.getLeft()==node:
+			node=parent
+			parent=node.getParent()
+		return parent
+	
+	"""finds successor of a given node
+	Time Complexity (worst case): O(logn) - going downward only or upward only
+	@pre: self.isRealNode(node.getR())
+	@type: AVLNode
+	@rtype: AVLNode
+	@returns: the predecessor
+	@Time Complexity: O(logn)
+	"""
+	def successor(self,node):
+		if node.getRight().isRealNode():
+			start=node.getRight()
+			while (start.getLeft().isRealNode()):
+				start=start.getLeft()
+			return start			
+		parent=node.getParent()
+		while parent!=None and parent.getRight()==node:
+			node=parent
+			parent=node.getParent()
+		return parent
+
+	"""calculates and sets the size of all given nodes by order
+
+	@rtype: None
+	@returns: None
 	@Time Complexity: O(1)
 	"""
-	def length(self):
-		return self.getRoot().getSize()
+	def updateSize(self,node1,node2=None,node3=None):
+		node1.setSize(1+node1.getLeft().getSize()+node1.getRight().getSize())
+		if node2!=None:
+			node2.setSize(1+node2.getLeft().getSize()+node2.getRight().getSize())
+		if node3!=None:
+			node3.setSize(1+node3.getLeft().getSize()+node3.getRight().getSize())
+
+	"""calculates and sets the height of all given nodes by order
+
+	@rtype: None
+	@returns: None
+	@Time Complexity: O(1)
+	"""
+	def updateHeight(self,node1,node2=None,node3=None):
+		node1.setHeight((1+max(node1.getLeft().getHeight(),node1.getRight().getHeight())))
+		if node2!=None:
+			node2.setHeight((1+max(node2.getLeft().getHeight(),node2.getRight().getHeight())))
+		if node3!=None:
+			node3.setHeight((1+max(node3.getLeft().getHeight(),node3.getRight().getHeight())))
+
+	"""right rotation to balance the list
+
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==2
+	@param parent: the old parent which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftSon.left.height-leftSon.right.height==1 or ==0
+	@param parent: the old left son which we need to rotate for balancing
+	@rtype: AVLNode
+	@returns: The parent of the given nodes
+	@Time complexity: O(1)
+	"""
+	def rotateRight(self,parent,leftSon): 	
+		parent.setLeft(leftSon.right)
+		parent.getLeft().setParent(parent)
+		leftSon.setRight(parent)
+		if parent==self.getRoot(): #AVL "criminal" is the tree's root
+			self.setRoot(leftSon)
+			leftSon.setParent(None)
+		elif parent.getParent().getLeft()==parent: #parent is a left son
+			parent.getParent().setLeft(leftSon)
+			leftSon.setParent(parent.getParent())
+		else: #parent is a right son
+			parent.getParent().setRight(leftSon)
+			leftSon.setParent(parent.getParent())
+		parent.setParent(leftSon)
+		self.updateSize(parent,leftSon)
+		self.updateHeight(parent,leftSon)
+		return leftSon
+	
+	"""right rotation to balance the list
+
+	@type parent: AVLNode
+	@pre: parent.left.height-parent.right.height==-2
+	@param parent: the old parent which we need to rotate for balancing
+	@type leftSon: AVLNode
+	@pre: leftSon.left.height-leftSon.right.height==1
+	@param parent: the old left son which we need to rotate for balancing
+	@rtype: AVLNode
+	@returns: The parent of the given nodes
+	@Time Complexity: O(1)
+	"""
+	def rotateLeft(self,parent,rightSon): 
+		parent.setRight(rightSon.left)
+		parent.getRight().setParent(parent)
+		rightSon.setLeft(parent)
+		if self.getRoot()==parent:
+			self.setRoot(rightSon)
+			rightSon.setParent(None)
+		elif parent.getParent().getLeft()==parent: #parent is a left son
+			parent.getParent().setLeft(rightSon)
+			rightSon.setParent(parent.parent)
+		else: #parent is a right son
+			parent.getParent().setRight(rightSon)
+			rightSon.setParent(parent.parent)
+		parent.setParent(rightSon)
+		self.updateSize(parent,rightSon)
+		self.updateHeight(parent,rightSon)
+		return rightSon
+
+	"""searches for a *value* in the list
+
+	@type val: str
+	@param val: a value to be searched
+	@rtype: int
+	@returns: the first index that contains val, -1 if not found.
+	@Time Complexity: O(n)
+	"""
+	def search(self, val):
+		return self.search_rec(self.getRoot(), val, 0)
+
+	def search_rec(self, node, val, cnt):
+		if (not node.isRealNode()):
+			return -1
+		left=self.search_rec(node.getLeft(),val, cnt)
+		if left>=0:
+			return left
+		if node.getValue()==val:
+			return cnt + node.getLeft().getSize()
+		else:
+			return self.search_rec(node.getRight(),val, cnt+ node.getLeft().getSize()+1)
+
+	"""returns minimal-index node with height<=h, 
+	@rtype: AVLNodes
+	@pre: 0 ≤ h ≤ self.root.height
+	@type h: int
+	@Time Complexity: O(self.height - h)
+	"""
+	def findMinimalNodeByHeight(self, h):
+		node = self.getRoot()
+		while node.getHeight()>h:
+			node = node.getLeft()
+		return node
+
+	"""returns maximal-index node with height<=h , Time Complexity: O(root.height-h))
+	@rtype: AVLNodes
+	@pre: 0 ≤ h ≤ self.root.height
+	@type h: int
+	@Time Complexity: O(self.height - h)
+	"""
+	def findMaximalNodeByHeight(self,h):
+		node = self.getRoot()
+		while node.height>h:
+			node = node.getRight()
+		return node
+
+	"""set sons and parents fields for join
+	@rtype: None
+	@pre: $side == 'R' or $side = 'L'
+	@post: $mid's sons are $left and $right and its parent is $parent
+	@Time Complexity: O(1)
+	"""
+	@staticmethod
+	def link_nodes(mid, left, right, parent, side):
+		mid.setLeft(left)
+		mid.getLeft().setParent(mid)
+		mid.setRight(right)
+		mid.getRight().setParent(mid)
+		mid.setParent(parent)
+		mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
+		mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
+		if parent!=None:
+			if (side=='R'):
+				parent.setRight(mid)
+			else:
+				parent.setLeft(mid)
 
 	"""join left_lst and right_lst using a 'middle' node.
 	@type left_lst, right_lst: AVLTreeList
@@ -553,7 +835,6 @@ class AVLTreeList(object):
 		
 		# execute rebalance starting from mid.parent:
 		self.rebalance(mid.getParent())
-
 
 	"""returns a tree which its root is the given node
 	@rtype: AVLTreeList
@@ -628,69 +909,6 @@ class AVLTreeList(object):
 		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
 		return [left_tree, splitter.getValue() ,right_tree]
 
-	# split version fir esperiment, delete before submit:
-	def splitExp(self, i):
-		# Create 2 instances of AVLTreeList which will be the lists after the split
-		left_tree = AVLTreeList()
-		right_tree = AVLTreeList()
-
-		# Find splitter node
-		splitter = self.retrieve_node(i)
-		
-		next_parent = splitter.getParent() # keep original parent 
-										   # in case pointers will change during join
-
-		# Set roots:
-		left_tree.setRoot(splitter.getLeft())
-		right_tree.setRoot(splitter.getRight())
-
-		isLeft = splitter.isLeftSon()
-
-		max=0; cnt=0; sum=0
-
-		while next_parent != None:
-			next_parent_to_set = next_parent.getParent() # keep next parent now in case 
-														 # pointers will change during join
-			if isLeft:
-				isLeft = next_parent.isLeftSon() # update this before the join operation
-												 # join in case pointers will change during join
-				# create tree from parent's right son:
-				tmp_right = AVLTreeList.createTreeByRoot(next_parent.getRight())
-				cnt += 1
-				diff = abs(right_tree.getRoot().getHeight() - tmp_right.getRoot().getHeight())
-				sum += diff
-				if diff >max: max = diff
-				# join trees:
-				right_tree.join(next_parent, tmp_right)
-				
-			else:
-				isLeft = next_parent.isLeftSon() # update this before the join operation
-												 # join in case pointers will change during join
-				# create trees from parent's left son:
-				tmp_left = AVLTreeList.createTreeByRoot(next_parent.getLeft())
-				cnt += 1
-				diff = abs(left_tree.getRoot().getHeight() - tmp_left.getRoot().getHeight())
-				sum += diff
-				if diff >max: max = diff
-				# join trees:
-				tmp_left.join(next_parent, left_tree)
-				# in this case update left_tree:
-				left_tree = tmp_left
-			next_parent = next_parent_to_set
-
-		# set roots parents to None:	
-		left_tree.getRoot().setParent(None)
-		right_tree.getRoot().setParent(None)
-
-		# set lastitems, firstitems, add O(logn) - does not ruin complexity
-		left_tree.setFirstItem(self.getFirstItem()) if i!=0 else left_tree.findMinimalNodeByHeight(0)
-		left_tree.setLastItem(left_tree.findMaximalNodeByHeight(0))
-		right_tree.setFirstItem(right_tree.findMinimalNodeByHeight(0))
-		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
-		avg = sum/cnt
-		return [left_tree, splitter.getValue() ,right_tree, avg, max]
-
-
 	"""concatenates lst to self
 
 	@type lst: AVLTreeList
@@ -699,7 +917,7 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	@Time Complexity: O(logn)
 	"""
-	def concat(self, lst):			
+	def concat(self, lst):
 		heights_diff = abs(self.getRoot().getHeight() - lst.getRoot().getHeight())
 
 		# edge cases: one if the lists is empty:
@@ -717,233 +935,3 @@ class AVLTreeList(object):
 		self.delete(self.length()-1)
 		self.join(linker, lst)
 		return heights_diff
-
-
-	"""rebalancing the tree from a given node to the root, 
-	@rtype: int
-	@returns: a counter of the number of rotations performed
-	@Time Complexity: O(self.height-start.height)
-	"""
-
-	def rebalance(self, start):
-		cnt=0
-		while (start !=None):
-			if abs(start.getBF())==2:
-				if start.getBF()<0:
-					if start.getRight().getBF()==1:
-						son=self.rotateRight(start.getRight(), start.getRight().getLeft())
-						start=self.rotateLeft(start,son)
-						cnt+=2
-					else:
-						start=self.rotateLeft(start, start.getRight())
-						cnt+=1
-				else: #BF is +2
-					if start.getLeft().getBF()==-1:
-						son=self.rotateLeft(start.getLeft(), start.getLeft().getRight())
-						start=self.rotateRight(start,son)
-						cnt+=2
-					else:
-						start=self.rotateRight(start, start.getLeft())
-						cnt+=1
-			else:
-				prev_height=start.getHeight()
-				self.updateHeight(start)
-				if prev_height!=start.getHeight(): cnt+=1 
-			self.updateSize(start)
-			start=start.getParent()
-		return cnt
-	
-
-	"""returns minimal-index node with height<=h, 
-	@rtype: AVLNodes
-	@pre: 0 ≤ h ≤ self.root.height
-	@type h: int
-	@Time Complexity: O(self.height - h)
-	"""
-	def findMinimalNodeByHeight(self, h):
-		node = self.getRoot()
-		while node.getHeight()>h:
-			node = node.getLeft()
-		return node
-
-	"""returns maximal-index node with height<=h , Time Complexity: O(root.height-h))
-	@rtype: AVLNodes
-	@pre: 0 ≤ h ≤ self.root.height
-	@type h: int
-	@Time Complexity: O(self.height - h)
-	"""
-	def findMaximalNodeByHeight(self,h):
-		node = self.getRoot()
-		while node.height>h:
-			node = node.getRight()
-		return node
-
-	"""set sons and parents fields for join
-	@rtype: None
-	@pre: $side == 'R' or $side = 'L'
-	@post: $mid's sons are $left and $right and its parent is $parent
-	@Time Complexity: O(1)
-	"""
-	@staticmethod
-	def link_nodes(mid, left, right, parent, side):
-		mid.setLeft(left)
-		mid.getLeft().setParent(mid)
-		mid.setRight(right)
-		mid.getRight().setParent(mid)
-		mid.setParent(parent)
-		mid.setSize(mid.getLeft().getSize()+mid.getRight().getSize()+1)
-		mid.setHeight(max(mid.getLeft().getHeight(), mid.getRight().getHeight())+1)
-		if parent!=None:
-			if (side=='R'):
-				parent.setRight(mid)
-			else:
-				parent.setLeft(mid)
-
-
-	"""searches for a *value* in the list
-
-	@type val: str
-	@param val: a value to be searched
-	@rtype: int
-	@returns: the first index that contains val, -1 if not found.
-	@Time Complexity: O(n)
-	"""
-	def search(self, val):
-		return self.search_rec(self.getRoot(), val, 0)
-
-	def search_rec(self, node, val, cnt):
-		if (not node.isRealNode()):
-			return -1
-		left=self.search_rec(node.getLeft(),val, cnt)
-		if left>=0:
-			return left
-		if node.getValue()==val:
-			return cnt + node.getLeft().getSize()
-		else:
-			return self.search_rec(node.getRight(),val, cnt+ node.getLeft().getSize()+1)
-
-	"""right rotation to balance the list
-
-	@type parent: AVLNode
-	@pre: parent.left.height-parent.right.height==2
-	@param parent: the old parent which we need to rotate for balancing
-	@type leftSon: AVLNode
-	@pre: leftSon.left.height-leftSon.right.height==1 or ==0
-	@param parent: the old left son which we need to rotate for balancing
-	@rtype: AVLNode
-	@returns: The parent of the given nodes
-	@Time complexity: O(1)
-	"""
-	def rotateRight(self,parent,leftSon): 	
-		parent.setLeft(leftSon.right)
-		parent.getLeft().setParent(parent)
-		leftSon.setRight(parent)
-		if parent==self.getRoot(): #AVL "criminal" is the tree's root
-			self.setRoot(leftSon)
-			leftSon.setParent(None)
-		elif parent.getParent().getLeft()==parent: #parent is a left son
-			parent.getParent().setLeft(leftSon)
-			leftSon.setParent(parent.getParent())
-		else: #parent is a right son
-			parent.getParent().setRight(leftSon)
-			leftSon.setParent(parent.getParent())
-		parent.setParent(leftSon)
-		self.updateSize(parent,leftSon)
-		self.updateHeight(parent,leftSon)
-		return leftSon
-	
-	"""right rotation to balance the list
-
-	@type parent: AVLNode
-	@pre: parent.left.height-parent.right.height==-2
-	@param parent: the old parent which we need to rotate for balancing
-	@type leftSon: AVLNode
-	@pre: leftSon.left.height-leftSon.right.height==1
-	@param parent: the old left son which we need to rotate for balancing
-	@rtype: AVLNode
-	@returns: The parent of the given nodes
-	@Time Complexity: O(1)
-	"""
-	def rotateLeft(self,parent,rightSon): 
-		parent.setRight(rightSon.left)
-		parent.getRight().setParent(parent)
-		rightSon.setLeft(parent)
-		if self.getRoot()==parent:
-			self.setRoot(rightSon)
-			rightSon.setParent(None)
-		elif parent.getParent().getLeft()==parent: #parent is a left son
-			parent.getParent().setLeft(rightSon)
-			rightSon.setParent(parent.parent)
-		else: #parent is a right son
-			parent.getParent().setRight(rightSon)
-			rightSon.setParent(parent.parent)
-		parent.setParent(rightSon)
-		self.updateSize(parent,rightSon)
-		self.updateHeight(parent,rightSon)
-		return rightSon
-
-
-	"""calculates and sets the size of all given nodes by order
-
-	@rtype: None
-	@returns: None
-	@Time Complexity: O(1)
-	"""
-	def updateSize(self,node1,node2=None,node3=None):
-		node1.setSize(1+node1.getLeft().getSize()+node1.getRight().getSize())
-		if node2!=None:
-			node2.setSize(1+node2.getLeft().getSize()+node2.getRight().getSize())
-		if node3!=None:
-			node3.setSize(1+node3.getLeft().getSize()+node3.getRight().getSize())
-
-	"""calculates and sets the height of all given nodes by order
-
-	@rtype: None
-	@returns: None
-	@Time Complexity: O(1)
-	"""
-	def updateHeight(self,node1,node2=None,node3=None):
-		node1.setHeight((1+max(node1.getLeft().getHeight(),node1.getRight().getHeight())))
-		if node2!=None:
-			node2.setHeight((1+max(node2.getLeft().getHeight(),node2.getRight().getHeight())))
-		if node3!=None:
-			node3.setHeight((1+max(node3.getLeft().getHeight(),node3.getRight().getHeight())))
-
-	"""finds predecessor of a given node
-	@pre: self.isRealNode(node.getLeft()) 
-	@type: AVLNode
-	@rtype: AVLNode
-	@returns: the predecessor
-	@Time Complexity: O(logn)
-	"""
-	def predecessor(self,node):
-		if node.getLeft().isRealNode():
-			start=node.getLeft()
-			while (start.getRight().isRealNode()):
-				start=start.getRight()
-			return start			
-		parent=node.getParent()
-		while parent!=None and parent.getLeft()==node:
-			node=parent
-			parent=node.getParent()
-		return parent
-	
-	"""finds successor of a given node
-	Time Complexity (worst case): O(logn) - going downward only or upward only
-	@pre: self.isRealNode(node.getR())
-	@type: AVLNode
-	@rtype: AVLNode
-	@returns: the predecessor
-	@Time Complexity: O(logn)
-	"""
-	def successor(self,node):
-		if node.getRight().isRealNode():
-			start=node.getRight()
-			while (start.getLeft().isRealNode()):
-				start=start.getLeft()
-			return start			
-		parent=node.getParent()
-		while parent!=None and parent.getRight()==node:
-			node=parent
-			parent=node.getParent()
-		return parent
