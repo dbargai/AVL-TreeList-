@@ -840,10 +840,18 @@ class AVLTreeList(object):
 		right_tree.getRoot().setParent(None)
 
 		# set lastitems, firstitems, add O(logn) - does not ruin complexity
-		left_tree.setFirstItem(self.getFirstItem()) if i!=0 else left_tree.findMinimalNodeByHeight(0)
-		left_tree.setLastItem(left_tree.findMaximalNodeByHeight(0))
-		right_tree.setFirstItem(right_tree.findMinimalNodeByHeight(0))
-		right_tree.lastitem = self.lastitem if left_tree.length()!=i else right_tree.findMaximalNodeByHeight(0)
+		if left_tree.length()>0:
+			left_tree.firstitem=left_tree.retrieve_node(0) 
+			left_tree.lastitem=left_tree.retrieve_node(left_tree.getRoot().getSize()-1)
+		else:
+			left_tree.firstitem=left_tree.getRoot()
+			left_tree.lastitem=left_tree.firstitem
+		if right_tree.length()>0:
+			right_tree.firstitem=right_tree.retrieve_node(0) 
+			right_tree.lastitem=right_tree.retrieve_node(right_tree.getRoot().getSize()-1)
+		else:
+			right_tree.firstitem=right_tree.getRoot()
+			right_tree.lastitem=right_tree.firstitem
 		return [left_tree, splitter.getValue() ,right_tree]
 
 	"""concatenates lst to self
@@ -872,3 +880,6 @@ class AVLTreeList(object):
 		self.delete(self.length()-1)
 		self.join(linker, lst)
 		return heights_diff
+
+	def append(self, val):
+			return self.insert(self.length(), val)
