@@ -880,6 +880,3 @@ class AVLTreeList(object):
 		self.delete(self.length()-1)
 		self.join(linker, lst)
 		return heights_diff
-
-	def append(self, val):
-			return self.insert(self.length(), val)
