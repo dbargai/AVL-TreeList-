@@ -1,8 +1,3 @@
-#username - dvirbargai
-#id1      - 208772715 
-#name1    - Dvir Bargai 
-#id2      - 208992883
-#name2    - Or Shemesh 
 
  
 """
